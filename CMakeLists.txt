@@ -16,3 +16,7 @@ target_include_directories(ds INTERFACE
 
 # Opcional: define padrão de C++
 target_compile_features(ds INTERFACE cxx_std_17)
+
+# Adiciona a biblioteca de testes
+set(TEST_LIB test_manager)
+add_subdirectory(lib/tm)
