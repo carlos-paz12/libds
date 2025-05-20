@@ -1,9 +1,9 @@
-#ifndef DEQUE_TPP
-#define DEQUE_TPP
+#ifndef _DEQUE_TPP_
+#define _DEQUE_TPP_
 
 namespace ds
 {
- /// @todo
+    /// @todo
 }
 
-#endif //!< DEQUE_TPP
+#endif //!< _DEQUE_TPP_

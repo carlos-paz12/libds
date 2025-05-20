@@ -1,11 +1,11 @@
-#ifndef DEQUE_HPP
-#define DEQUE_HPP
+#ifndef _DEQUE_HPP_
+#define _DEQUE_HPP_
 
 namespace ds
 {
- /// @todo
+    /// @todo
 }
 
-#include "deque.tpp" // Implementação da classe `Deque`.
+#include "ds/deque.tpp" // Implementação da classe `Deque`.
 
-#endif //!< DEQUE_HPP
+#endif //!< _DEQUE_HPP_
