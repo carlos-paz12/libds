@@ -3,6 +3,7 @@
 
 #include <algorithm>  // std::copy, std::equal, std::fill
 #include <array>
+#include <cmath>
 #include <cstddef>  // std::size_t
 #include <cstdint>
 #include <iostream>  // std::cout, std::endl
@@ -16,10 +17,10 @@
 namespace ds
 {
     // Forward declaration. This is necessary so that we can state
-    // that deque is a friend of MyIterator.
-    // Inside deque we need access to the private members of MyIterator.
-    template <typename T, size_t BlockSize = 3, size_t DefaultBlkMapSize = 1>
-    class deque;
+    // that Deque is a friend of MyIterator.
+    // Inside Deque we need access to the private members of MyIterator.
+    template <typename T, size_t BlockSize = 3,size_t DefaultBlkMapSize = 1>
+    class Deque;
 
     template <typename T, size_t BlockSize, typename BlockItr, typename ItemItr>
     class MyIterator
@@ -63,7 +64,7 @@ namespace ds
         // it -= 3; or it -= -3;
         MyIterator operator-=(difference_type n) { return *this; }
         // it = it2 - it3;
-        // The *this iterator is usually the farther iterator (down the deque).
+        // The *this iterator is usually the farther iterator (down the Deque).
         difference_type operator-(const MyIterator &other) const { return 0; }
         bool operator==(const MyIterator &other) const { return false; }
         bool operator!=(const MyIterator &other) const { return false; }
@@ -83,12 +84,12 @@ namespace ds
         BlockItr block;  //!< The block the iterator points to.
         ItemItr current; //!< The last location where an insertion happened inside the block.
 
-        // We need to grant this friendship to allow deque access to the iterator's private attributes.
-        friend class deque<T>;
+        // We need to grant this friendship to allow Deque access to the iterator's private attributes.
+        friend class Deque<T>;
     };
 
     template <typename T, size_t BlockSize, size_t DefaultBlkMapSize>
-    class deque
+    class Deque
     {
     public:
         //== Typical container aliases
@@ -99,7 +100,7 @@ namespace ds
         using const_reference = const value_type &; //!< Const reference to a value.
         using difference_type = ptrdiff_t;          //!< Difference type between pointers.
 
-        //== Aliases for the deque types.
+        //== Aliases for the Deque types.
         /// A block is a fixed sized array of T that actually holds the data.
         using block_t = std::array<T, BlockSize>;
         /// Basic smart pointer to a block of data items.
@@ -116,98 +117,125 @@ namespace ds
 
     private:
         //== Management variables.
-        std::unique_ptr<block_list_t> m_mob; //!< The dynamic map of blocks.
+        std::unique_ptr<block_list_t>   m_mob; //!< The dynamic map of blocks.
         iterator m_front_itr;                //!< Iterator to the front block.
         iterator m_back_itr;                 //!< Iterator to the back block.
         size_t m_count{0};                   //!< # of elements stored in the map.
 
     public:
         /// Dtro.
-        ~deque() = default;
+        ~Deque() = default;
 
         /// Default Ctro.
-        deque() {}
+        Deque() {
+             // Inicializa o vetor de blocos com ponteiros nulos
+             m_mob = std::make_unique<block_list_t>(DefaultBlkMapSize);
 
-        /*! Construct a deque and initialize it with `n` copies of `value` of type `T`. If `value` is not
-         *  provided, a default constructor `T()` is used.
-         */
-        explicit deque(size_type n, const_reference value = T()) {
-            // Número de blocos necessários para armazenar n elementos
-            size_type blocks_needed = (n + BlockSize - 1) / BlockSize;
-        
-            // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
-            size_type map_size = std::max(size_type(3), blocks_needed + 2); // 2 extras: frente e trás
-        
-            // Inicializa o vetor de blocos com ponteiros nulos
-            m_mob = std::make_unique<block_list_t>(map_size);
-        
-            // Aloca os blocos
-            for (size_type i = 0; i < map_size; ++i) {
-                (*m_mob)[i] = std::make_shared<block_t>();
+              // Aloca os blocos
+            for (size_type i {0}; i < map_size; ++i) {
+                (*m_mob)[i] = std::make_shared<block_t>(); // O tamanho do bloco está definido em `block_t`.
             }
-        
+
             // Posição central onde os dados começarão
-            size_type start_block = (map_size - blocks_needed) / 2;
-        
+            size_type start_block {1};
+
             // Inicializa iterador para o início (posição lógica 0)
             m_front_itr = iterator(
                 m_mob->begin() + start_block,                   // iterador para o bloco do início
                 (*m_mob)[start_block]->begin()                  // iterador para a posição inicial dentro do bloco
             );
-        
+
             // Inicializa iterador para o fim
-            size_type end_block = start_block + (blocks_needed ? blocks_needed - 1 : 0);
-            size_type offset = (n == 0) ? 0 : (n - 1) % BlockSize;
-        
+            size_type end_block {start_block + DefaultBlkMapSize};
+            size_type offset {DefaultBlkMapSize % BlockSize}; 
+
             m_back_itr = iterator(
                 m_mob->begin() + end_block,                     // iterador para o último bloco com dados
                 (*m_mob)[end_block]->begin() + offset           // posição dentro do bloco
             );
-        
+
+        }
+
+        /*! Construct a Deque and initialize it with `n` copies of `value` of type `T`. If `value` is not
+         *  provided, a default constructor `T()` is used.
+         */
+        explicit Deque(size_type n, const_reference value = T()) {
+            // Número de blocos necessários para armazenar n elementos
+            size_type blocks_needed {static_cast<size_type>(std::ceil((n + BlockSize - 1) / BlockSize))};
+
+            // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
+            size_type map_size{blocks_needed + 2}; // 2 extras: frente e trás
+
+            // Inicializa o vetor de blocos com ponteiros nulos
+            m_mob = std::make_unique<block_list_t>(map_size);
+
+            // Aloca os blocos
+            for (size_type i {0}; i < map_size; ++i) {
+                (*m_mob)[i] = std::make_shared<block_t>(); // O tamanho do bloco está definido em `block_t`.
+            }
+
+            // Posição central onde os dados começarão
+            size_type start_block {1};
+
+            // Inicializa iterador para o início (posição lógica 0)
+            m_front_itr = iterator(
+                m_mob->begin() + start_block,                   // iterador para o bloco do início
+                (*m_mob)[start_block]->begin()                  // iterador para a posição inicial dentro do bloco
+            );
+
+            // Inicializa iterador para o fim
+            size_type end_block {start_block + (blocks_needed ? blocks_needed - 1 : 0)};
+            size_type offset {(n == 0) ? n : (n - 1) % BlockSize}; /// @todo para que serve o `offset`.
+
+            m_back_itr = iterator(
+                m_mob->begin() + end_block,                     // iterador para o último bloco com dados
+                (*m_mob)[end_block]->begin() + offset           // posição dentro do bloco
+            );
+
             // Preenche os elementos com 'value'
-            iterator it = m_front_itr;
+            iterator it {m_front_itr};
             for (size_type i = 0; i < n; ++i) {
                 *(it) = value;
                 ++it;
             }
-        
+
             // Atualiza a contagem
             m_count = n;
         }
-        
+
 
         /// Ctro. from a range.
         // template <class InputIt>
         template <typename InputIt, typename = typename std::iterator_traits<InputIt>::iterator_category>
-        deque(InputIt first, InputIt last) {}
+        Deque(InputIt first, InputIt last) {}
 
         /// Copy Ctro.
-        deque(const deque &other) {}
+        Deque(const Deque &other) {}
 
         /// Initializer list Ctro.
-        deque(const std::initializer_list<T> &il) {}
+        Deque(const std::initializer_list<T> &il) {}
 
-        deque &operator=(const deque &other) {}
+        Deque &operator=(const Deque &other) {}
 
-        /// Return the number of elements in the deque.
+        /// Return the number of elements in the Deque.
         [[nodiscard]] size_type size() const { return m_count; }
 
-        /// Return `true` if the deque has no elements, `false` otherwise.
+        /// Return `true` if the Deque has no elements, `false` otherwise.
         [[nodiscard]] bool empty() const { return m_count == 0; }
 
-        /// Remove all elements from the deque.
+        /// Remove all elements from the Deque.
         void clear() {}
 
-        /// Insert `value` at the beginning of the deque.
+        /// Insert `value` at the beginning of the Deque.
         void push_front(const_reference value) { insert(cbegin(), value); }
 
-        /// Insert `value` at the end of the deque.
+        /// Insert `value` at the end of the Deque.
         void push_back(const_reference value) { insert(cend(), value); }
 
-        /// Remove the first element of the deque.
+        /// Remove the first element of the Deque.
         void pop_front() {}
 
-        /// Remove the last element of the deque.
+        /// Remove the last element of the Deque.
         void pop_back() {}
 
         reference front() { return *begin(); }
@@ -215,7 +243,7 @@ namespace ds
         reference back() { return *(--end()); }
         const_reference back() const { return *(--cend()); }
 
-        /// Replaces the content of the deque with 'count' copies f 'value'.
+        /// Replaces the content of the Deque with 'count' copies f 'value'.
         void assign(size_type count, const T &value) {}
 
         /// Returns a reference to the element at specified location `pos`.
@@ -230,17 +258,17 @@ namespace ds
 
         /// Returns a reference to the element at specified location `pos`.i
         /*! This method checks the bounds and may throw std::out_of_range,
-         * in case the idx is outside the deque's limits.
+         * in case the idx is outside the Deque's limits.
          */
         reference at(size_type idx) {}
 
         /// Returns a const ref. to the element at specified location pos.
         /*! This method checks the bounds and may throw std::out_of_range,
-         * in case the idx is outside the deque's limits.
+         * in case the idx is outside the Deque's limits.
          */
         const_reference at(size_type idx) const {}
 
-        /// Returns the storage capacity of the deque.
+        /// Returns the storage capacity of the Deque.
         size_t capacity() { return m_mob->size() * BlockSize; }
 
         /// Change the number of elements stored in the container.
@@ -256,16 +284,16 @@ namespace ds
         /// Deletes unused slots.
         void shrink_to_fit() {}
 
-        /// Return an iterator to the deque's first element.
+        /// Return an iterator to the Deque's first element.
         iterator begin() {}
 
-        /// Return an iterator to a location following the deque's last element.
+        /// Return an iterator to a location following the Deque's last element.
         iterator end() {}
 
-        /// Return a const iterator to the deque's first element.
+        /// Return a const iterator to the Deque's first element.
         const_iterator cbegin() const {}
 
-        /// Return a const iterator to a location following the deque's last element.
+        /// Return a const iterator to a location following the Deque's last element.
         const_iterator cend() const {}
 
         /// Inserts `value` before `cpos`.
@@ -292,11 +320,11 @@ namespace ds
         /// Removes the element at `pos`.
         iterator erase(iterator pos) {}
 
-        /// Replaces the content of the deque with the values from [first,last).
+        /// Replaces the content of the Deque with the values from [first,last).
         template <typename InputIt>
         void assign(InputIt first, InputIt last) {}
 
-        /// Replaces the content of the deque with the values from the initializer_list.
+        /// Replaces the content of the Deque with the values from the initializer_list.
         void assign(const std::initializer_list<T> &il) {}
 
     private:
@@ -356,7 +384,7 @@ namespace ds
         /// Returns how many elements exist in the end block of the target `zone`.
         [[nodiscard]] size_type block_occupancy_of(zone_e zone) const {}
 
-        /// Clear the deque of all elements by resetting the control iterators to middle of the MOB.
+        /// Clear the Deque of all elements by resetting the control iterators to middle of the MOB.
         void reset() {}
 
     public:
@@ -476,7 +504,7 @@ namespace ds
     };
 
     template <typename T>
-    bool operator==(const deque<T> &lhs, const deque<T> &rhs)
+    bool operator==(const Deque<T> &lhs, const Deque<T> &rhs)
     {
         if (lhs.size() != rhs.size())
         {
@@ -486,7 +514,7 @@ namespace ds
     }
 
     template <typename T>
-    bool operator!=(const deque<T> &lhs, const deque<T> &rhs)
+    bool operator!=(const Deque<T> &lhs, const Deque<T> &rhs)
     {
         return not(lhs == rhs);
     }
