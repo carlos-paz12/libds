@@ -1,91 +1,104 @@
 #ifndef _DEQUE_HPP_
 #define _DEQUE_HPP_
 
-#include <algorithm>  // std::copy, std::equal, std::fill
+#include <algorithm> // std::copy, std::equal, std::fill
 #include <array>
 #include <cmath>
-#include <cstddef>  // std::size_t
+#include <cstddef> // std::size_t
 #include <cstdint>
-#include <iostream>  // std::cout, std::endl
-#include <iterator>  // std::advance, std::begin(), std::end(), std::ostream_iterator, std::distance
-#include <memory>    // std::unique_ptr
+#include <iostream> // std::cout, std::endl
+#include <iterator> // std::advance, std::begin(), std::end(), std::ostream_iterator, std::distance
+#include <memory>   // std::unique_ptr
 #include <sstream>
 #include <utility>
 #include <vector>
-#include <initializer_list>  // std::initializer_list
+#include <initializer_list> // std::initializer_list
 
 namespace ds
 {
     // Forward declaration. This is necessary so that we can state
-    // that Deque is a friend of MyIterator.
-    // Inside Deque we need access to the private members of MyIterator.
-    template <typename T, size_t BlockSize = 3,size_t DefaultBlkMapSize = 1>
+    // that Deque is a friend of Iterator.
+    // Inside Deque we need access to the private members of Iterator.
+    template <typename T, size_t BlockSize = 3, size_t DefaultBlkMapSize = 1>
     class Deque;
 
-    template <typename T, size_t BlockSize, typename BlockItr, typename ItemItr>
-    class MyIterator
+    template <typename T, std::size_t BlockSize, typename BlockItr, typename ItemItr>
+    class Iterator
     {
     public:
         //== Typical iterator aliases
-        using iterator_category = std::random_access_iterator_tag;
         using value_type = T;
-        using difference_type = std::ptrdiff_t;
-        using pointer = value_type *;
         using reference = value_type &;
         using const_reference = const value_type &;
+        using pointer = value_type *;
+        using difference_type = std::ptrdiff_t;
+        using iterator_category = std::random_access_iterator_tag;
 
-        /// Default constructor
-        MyIterator() = default;
-        /// Useful Constructor
-        MyIterator(BlockItr blk, ItemItr c) : block{blk}, current{c} {}
+    private:
+        BlockItr m_block;  //!< The block the iterator points to.
+        ItemItr m_current; //!< The last location where an insertion happened inside the block.
+
+        // We need to grant this friendship to allow Deque access to the iterator's private attributes.
+        friend class Deque<T>;
+
+    public:
+        /// Default constructor.
+        Iterator() : m_block(), m_current() {}
+
+        /// Useful constructor.
+        Iterator(BlockItr block, ItemItr current) : m_block(block), m_current(current) {}
+
+        /// Copy constructor.
+        Iterator(const Iterator &other) : m_block(other.m_block), m_current(other.m_current) {}
+
+        /// Assigment operator.
+        Iterator &operator=(const Iterator &other)
+        {   if(this != &other){
+            m_block = other.m_block;
+            m_current = other.m_current;}
+            return *this;
+        }
 
         /// Dereference operator.
-        reference operator*() { return *current; }
+        reference operator*() { return *m_current; }
 
         /// Pre-increment operator.
-        MyIterator &operator++() { return *this; }
+        Iterator &operator++() { return *this; }
         /// Post-increment operator.
-        MyIterator operator++(int) { return *this; }
+        Iterator operator++(int) { return *this; }
         /// Pre-decremente operator.
-        MyIterator &operator--() { return *this; }
+        Iterator &operator--() { return *this; }
         /// Post-decremente operator.
-        MyIterator operator--(int) { return *this; }
+        Iterator operator--(int) { return *this; }
         // it = it2 + 3; or it = it2 + (-3)
-        MyIterator operator+(difference_type n) const { return *this; }
+        Iterator operator+(difference_type n) const { return *this; }
         // it = 3 + it2; or it = (-3) + it2
-        friend MyIterator operator+(MyIterator::difference_type n, const MyIterator &other)
+        friend Iterator operator+(Iterator::difference_type n, const Iterator &other)
         {
             return other;
         }
         // it = it2 - 3; or it = it2 - (-3)
-        MyIterator operator-(difference_type n) const { return *this; }
+        Iterator operator-(difference_type n) const { return *this; }
         // it += 3; or it += -3;
-        MyIterator operator+=(difference_type n) { return *this; }
+        Iterator operator+=(difference_type n) { return *this; }
         // it -= 3; or it -= -3;
-        MyIterator operator-=(difference_type n) { return *this; }
+        Iterator operator-=(difference_type n) { return *this; }
         // it = it2 - it3;
         // The *this iterator is usually the farther iterator (down the Deque).
-        difference_type operator-(const MyIterator &other) const { return 0; }
-        bool operator==(const MyIterator &other) const { return false; }
-        bool operator!=(const MyIterator &other) const { return false; }
-        bool operator<(const MyIterator &other) const { return false; }
-        bool operator>(const MyIterator &other) const { return false; }
-        bool operator<=(const MyIterator &other) const { return false; }
-        bool operator>=(const MyIterator &other) const { return false; }
+        difference_type operator-(const Iterator &other) const { return 0; }
+        bool operator==(const Iterator &other) const { return false; }
+        bool operator!=(const Iterator &other) const { return false; }
+        bool operator<(const Iterator &other) const { return false; }
+        bool operator>(const Iterator &other) const { return false; }
+        bool operator<=(const Iterator &other) const { return false; }
+        bool operator>=(const Iterator &other) const { return false; }
 
         [[nodiscard]] std::string to_string() const
         {
             std::ostringstream oss;
-            oss << "[&block: " << *block << ", &current: " << current << "]";
+            oss << "[&block: " << *m_block << ", &current: " << m_current << "]";
             return oss.str();
         }
-
-    private:
-        BlockItr block;  //!< The block the iterator points to.
-        ItemItr current; //!< The last location where an insertion happened inside the block.
-
-        // We need to grant this friendship to allow Deque access to the iterator's private attributes.
-        friend class Deque<T>;
     };
 
     template <typename T, size_t BlockSize, size_t DefaultBlkMapSize>
@@ -108,16 +121,16 @@ namespace ds
         /// This type represents a list of smart pointers to blocks of memory.
         using block_list_t = std::vector<block_sptr_t>;
         /// Regular iterator.
-        using iterator = MyIterator<T, BlockSize, typename block_list_t::iterator, typename block_t::iterator>;
+        using iterator = Iterator<T, BlockSize, typename block_list_t::iterator, typename block_t::iterator>;
         /// Const iterator.
-        using const_iterator = MyIterator<const T,
-                                          BlockSize,
-                                          typename block_list_t::const_iterator,
-                                          typename block_t::const_iterator>;
+        using const_iterator = Iterator<const T,
+                                        BlockSize,
+                                        typename block_list_t::const_iterator,
+                                        typename block_t::const_iterator>;
 
     private:
         //== Management variables.
-        std::unique_ptr<block_list_t>   m_mob; //!< The dynamic map of blocks.
+        std::unique_ptr<block_list_t> m_mob; //!< The dynamic map of blocks.
         iterator m_front_itr;                //!< Iterator to the front block.
         iterator m_back_itr;                 //!< Iterator to the back block.
         size_t m_count{0};                   //!< # of elements stored in the map.
@@ -127,74 +140,75 @@ namespace ds
         ~Deque() = default;
 
         /// Default Ctro.
-        Deque() {
-             // Inicializa o vetor de blocos com ponteiros nulos
-             m_mob = std::make_unique<block_list_t>(DefaultBlkMapSize);
+        Deque()
+        {
+            // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
+            size_type map_size{DefaultBlkMapSize}; // 2 extras: frente e trás
+            // Inicializa o vetor de blocos com ponteiros nulos
+            m_mob = std::make_unique<block_list_t>(map_size);
 
-              // Aloca os blocos
-            for (size_type i {0}; i < map_size; ++i) {
+            // Aloca os blocos
+            for (size_type i{0}; i < map_size; ++i)
+            {
                 (*m_mob)[i] = std::make_shared<block_t>(); // O tamanho do bloco está definido em `block_t`.
             }
 
             // Posição central onde os dados começarão
-            size_type start_block {1};
+            size_type start_block{1};
 
             // Inicializa iterador para o início (posição lógica 0)
             m_front_itr = iterator(
-                m_mob->begin() + start_block,                   // iterador para o bloco do início
-                (*m_mob)[start_block]->begin()                  // iterador para a posição inicial dentro do bloco
+                m_mob->begin() + start_block,  // iterador para o bloco do início
+                (*m_mob)[start_block]->begin() // iterador para a posição inicial dentro do bloco
             );
 
             // Inicializa iterador para o fim
-            size_type end_block {start_block + DefaultBlkMapSize};
-            size_type offset {DefaultBlkMapSize % BlockSize}; 
+            size_type end_block{start_block + DefaultBlkMapSize};
+            size_type offset{DefaultBlkMapSize % BlockSize};
 
             m_back_itr = iterator(
-                m_mob->begin() + end_block,                     // iterador para o último bloco com dados
-                (*m_mob)[end_block]->begin() + offset           // posição dentro do bloco
+                m_mob->begin() + end_block,           // iterador para o último bloco com dados
+                (*m_mob)[end_block]->begin() + offset // posição dentro do bloco
             );
-
         }
 
         /*! Construct a Deque and initialize it with `n` copies of `value` of type `T`. If `value` is not
          *  provided, a default constructor `T()` is used.
          */
-        explicit Deque(size_type n, const_reference value = T()) {
+        explicit Deque(size_type n, const_reference value = T())
+        {
             // Número de blocos necessários para armazenar n elementos
-            size_type blocks_needed {static_cast<size_type>(std::ceil((n + BlockSize - 1) / BlockSize))};
-
+            size_type blocks_needed{static_cast<size_type>(std::ceil((n + BlockSize - 1) / BlockSize))};
+            
             // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
             size_type map_size{blocks_needed + 2}; // 2 extras: frente e trás
-
             // Inicializa o vetor de blocos com ponteiros nulos
             m_mob = std::make_unique<block_list_t>(map_size);
-
             // Aloca os blocos
-            for (size_type i {0}; i < map_size; ++i) {
+            for (size_type i{0}; i < map_size; ++i)
+            {
                 (*m_mob)[i] = std::make_shared<block_t>(); // O tamanho do bloco está definido em `block_t`.
             }
-
             // Posição central onde os dados começarão
-            size_type start_block {1};
-
-            // Inicializa iterador para o início (posição lógica 0)
+            size_type start_block{1};
+            // Inicializa iterador para o in ício (posição lógica 0)
             m_front_itr = iterator(
-                m_mob->begin() + start_block,                   // iterador para o bloco do início
-                (*m_mob)[start_block]->begin()                  // iterador para a posição inicial dentro do bloco
+                m_mob->begin() + start_block,  // iterador para o bloco do início
+                (*m_mob)[start_block]->begin() // iterador para a posição inicial dentro do bloco
             );
-
             // Inicializa iterador para o fim
-            size_type end_block {start_block + (blocks_needed ? blocks_needed - 1 : 0)};
-            size_type offset {(n == 0) ? n : (n - 1) % BlockSize}; /// @todo para que serve o `offset`.
+            size_type end_block{start_block + (blocks_needed ? blocks_needed - 1 : 0)};
+            size_type offset{(n == 0) ? n : (n - 1) % BlockSize}; /// @todo para que serve o `offset`.
 
             m_back_itr = iterator(
-                m_mob->begin() + end_block,                     // iterador para o último bloco com dados
-                (*m_mob)[end_block]->begin() + offset           // posição dentro do bloco
+                m_mob->begin() + end_block,           // iterador para o último bloco com dados
+                (*m_mob)[end_block]->begin() + offset // posição dentro do bloco
             );
 
             // Preenche os elementos com 'value'
-            iterator it {m_front_itr};
-            for (size_type i = 0; i < n; ++i) {
+            iterator it{m_front_itr};
+            for (size_type i = 0; i < n; ++i)
+            {
                 *(it) = value;
                 ++it;
             }
@@ -202,7 +216,6 @@ namespace ds
             // Atualiza a contagem
             m_count = n;
         }
-
 
         /// Ctro. from a range.
         // template <class InputIt>
@@ -285,7 +298,10 @@ namespace ds
         void shrink_to_fit() {}
 
         /// Return an iterator to the Deque's first element.
-        iterator begin() {}
+        iterator begin()
+        {
+            return iterator(m_front_itr);
+        }
 
         /// Return an iterator to a location following the Deque's last element.
         iterator end() {}
@@ -329,14 +345,14 @@ namespace ds
 
     private:
         /// Returns how many unused slots of the MOB we have at the target zone.
-        size_t free_slots(zone_e zone)
-        {
-            return (zone == zone_e::at_front) ? std::distance(m_mob->begin(), m_front_itr.block)
-                                              : std::distance(std::next(m_back_itr.block), m_mob->end());
-        }
+        // size_t free_slots(zone_e zone)
+        // {
+        //     return (zone == zone_e::at_front) ? std::distance(m_mob->begin(), m_front_itr.block)
+        //                                       : std::distance(std::next(m_back_itr.block), m_mob->end());
+        // }
 
         /// Return how many free slots the entire MOB has.
-        size_t free_slots() { return free_slots(zone_e::at_front) + free_slots(zone_e::at_back); }
+        // size_t free_slots() { return free_slots(zone_e::at_front) + free_slots(zone_e::at_back); }
 
         /// Expand the Map Of (pointers to) Blocks (aka MOB).
         /*!
@@ -379,10 +395,10 @@ namespace ds
         }
 
         /// Returns the number of occupied blocks in the m.o.b.
-        size_type used_blocks() {}
+        size_type used_blocks() { return 0; }
 
         /// Returns how many elements exist in the end block of the target `zone`.
-        [[nodiscard]] size_type block_occupancy_of(zone_e zone) const {}
+        // [[nodiscard]] size_type block_occupancy_of(zone_e zone) const {}
 
         /// Clear the Deque of all elements by resetting the control iterators to middle of the MOB.
         void reset() {}
@@ -390,9 +406,10 @@ namespace ds
     public:
         [[nodiscard]] std::string to_string() const
         {
-            return to_string_address();
+            // return to_string_address();
             // return to_string_full();
             // return to_string_short();
+            return std::string();
         }
 
         [[nodiscard]] std::string to_string_full() const
