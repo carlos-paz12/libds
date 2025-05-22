@@ -131,7 +131,50 @@ namespace ds
         /*! Construct a deque and initialize it with `n` copies of `value` of type `T`. If `value` is not
          *  provided, a default constructor `T()` is used.
          */
-        explicit deque(size_type n, const_reference value = T()) {}
+        explicit deque(size_type n, const_reference value = T()) {
+            // Número de blocos necessários para armazenar n elementos
+            size_type blocks_needed = (n + BlockSize - 1) / BlockSize;
+        
+            // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
+            size_type map_size = std::max(size_type(3), blocks_needed + 2); // 2 extras: frente e trás
+        
+            // Inicializa o vetor de blocos com ponteiros nulos
+            m_mob = std::make_unique<block_list_t>(map_size);
+        
+            // Aloca os blocos
+            for (size_type i = 0; i < map_size; ++i) {
+                (*m_mob)[i] = std::make_shared<block_t>();
+            }
+        
+            // Posição central onde os dados começarão
+            size_type start_block = (map_size - blocks_needed) / 2;
+        
+            // Inicializa iterador para o início (posição lógica 0)
+            m_front_itr = iterator(
+                m_mob->begin() + start_block,                   // iterador para o bloco do início
+                (*m_mob)[start_block]->begin()                  // iterador para a posição inicial dentro do bloco
+            );
+        
+            // Inicializa iterador para o fim
+            size_type end_block = start_block + (blocks_needed ? blocks_needed - 1 : 0);
+            size_type offset = (n == 0) ? 0 : (n - 1) % BlockSize;
+        
+            m_back_itr = iterator(
+                m_mob->begin() + end_block,                     // iterador para o último bloco com dados
+                (*m_mob)[end_block]->begin() + offset           // posição dentro do bloco
+            );
+        
+            // Preenche os elementos com 'value'
+            iterator it = m_front_itr;
+            for (size_type i = 0; i < n; ++i) {
+                *(it) = value;
+                ++it;
+            }
+        
+            // Atualiza a contagem
+            m_count = n;
+        }
+        
 
         /// Ctro. from a range.
         // template <class InputIt>
@@ -448,7 +491,5 @@ namespace ds
         return not(lhs == rhs);
     }
 }
-
-#include "ds/deque.tpp" // Implementação da classe `Deque`.
 
 #endif //!< _DEQUE_HPP_
