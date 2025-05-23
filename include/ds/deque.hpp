@@ -85,9 +85,21 @@ Iterator &operator++() {
   }
 
   /// Pre-decremente operator.
-  Iterator &operator--() { return *this; }
+  Iterator &operator--() {
+    if (m_current == (*m_block)->begin()) { // Se chegou ao início do bloco
+        m_block--;                          // Retrocede para o bloco anterior
+        m_current = (*m_block)->end();      // Posição após o último
+    }
+    m_current--;                            // Agora retrocede para o último elemento válido
+    return *this;
+   }
+
   /// Post-decremente operator.
-  Iterator operator--(int) { return *this; }
+  Iterator operator--(int) { 
+    Iterator temp = *this; // salva estado atual
+  --(*this);             // chama o Pre-decremente 
+    return temp;           // retorna o iterador antigo
+  }
   // it = it2 + 3; or it = it2 + (-3)
   Iterator operator+(difference_type n) const { return *this; }
   // it = 3 + it2; or it = (-3) + it2
@@ -226,7 +238,7 @@ public:
     // Preenche os elementos com 'value'
     iterator it{m_front_itr};
     for (size_type i = 0; i < n; ++i) {
-      *(it) = value;
+      *(it) = value * i; // remover o * i depois...
       ++it;
     }
 
@@ -317,11 +329,10 @@ public:
   void shrink_to_fit() {}
 
   /// Return an iterator to the Deque's first element.
-  iterator begin() { return iterator(m_front_itr); }
+ iterator begin() { return iterator(m_front_itr); }
 
   /// Return an iterator to a location following the Deque's last element.
-  iterator end() {}
-
+  iterator end()   { return iterator(m_back_itr); }
   /// Return a const iterator to the Deque's first element.
   const_iterator cbegin() const {}
 
