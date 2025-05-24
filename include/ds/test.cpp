@@ -91,6 +91,14 @@ int main() {
     std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 0
     it += 3; // Avança 3 posições
     std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 126
+    std::cout << "\n";
+
+    std::cout<<"Testando o it -= numero:\n";
+    it = d.begin() + 4; // Avança 4 posições
+    std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 168
+    it -= 3; // Retrocede 3 posições
+    std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 42
+    std::cout << "\n";
 
     return 0;
 }
