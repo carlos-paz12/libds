@@ -130,7 +130,10 @@ Iterator &operator++() {
     return *this; // Retorna o iterador atualizado
    }
   // it -= 3; or it -= -3;
-  Iterator operator-=(difference_type n) { return *this; }
+  Iterator operator-=(difference_type n) {
+    *this = *this - n; // Chama o operador de subtração
+    return *this; // Retorna o iterador atualizado
+   }
   // it = it2 - it3;
   // The *this iterator is usually the farther iterator (down the Deque).
   difference_type operator-(const Iterator &other) const { return 0; }
@@ -141,8 +144,8 @@ Iterator &operator++() {
   bool operator<=(const Iterator &other) const { return false; }
   bool operator>=(const Iterator &other) const { return false; }
   
-  pointer get_current() const { return m_current; }
-  BlockItr get_block() const { return m_block; }
+  pointer get_current() const { return m_current; } // para o to_string_full
+  BlockItr get_block() const { return m_block; } //para o to_string_full
 
   [[nodiscard]] std::string to_string() const {
     std::ostringstream oss;
