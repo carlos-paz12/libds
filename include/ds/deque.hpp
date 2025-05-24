@@ -155,7 +155,9 @@ Iterator &operator++() {
     return (m_block < other.m_block) or
            ((m_block == other.m_block) and (m_current < other.m_current));
    }
-  bool operator>(const Iterator &other) const { return false; }
+  bool operator>(const Iterator &other) const {
+    return not(*this < other);
+  }
   bool operator<=(const Iterator &other) const { return false; }
   bool operator>=(const Iterator &other) const { return false; }
   
