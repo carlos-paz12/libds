@@ -43,12 +43,12 @@ private:
   friend class Deque<T>;
 
 public:
-  /// Default constructor.
-  Iterator() : m_block(), m_current() {}
+/// Default constructor.
+Iterator() : m_block(), m_current() {}
 
-  /// Useful constructor.
-  Iterator(BlockItr block, ItemItr current)
-      : m_block(block), m_current(current) {}
+/// Useful constructor.
+Iterator(BlockItr block, ItemItr current)
+: m_block(block), m_current(current) {}
 
   /// Copy constructor.
   Iterator(const Iterator &other)
@@ -70,13 +70,13 @@ public:
 Iterator &operator++() {
     m_current++; // Avança o iterador dentro do bloco atual
     if (m_current == (*m_block)->end()) { // Se chegou ao fim do bloco
-        m_block++;                       // Avança para o próximo bloco
-        m_current = (*m_block)->begin(); // Posiciona no início do novo bloco
+      m_block++;                       // Avança para o próximo bloco
+      m_current = (*m_block)->begin(); // Posiciona no início do novo bloco
     }
     return *this;
-}
- 
-
+  }
+  
+  
   /// Post-increment operator.
   Iterator operator++(int) {
     Iterator temp = *this; // salva estado atual
@@ -104,11 +104,11 @@ Iterator &operator++() {
   Iterator operator+(difference_type n) const { return *this; }
   // it = 3 + it2; or it = (-3) + it2
   friend Iterator operator+(Iterator::difference_type n,
-                            const Iterator &other) {
-    return other;
-  }
-  // it = it2 - 3; or it = it2 - (-3)
-  Iterator operator-(difference_type n) const { return *this; }
+    const Iterator &other) {
+      return other;
+    }
+    // it = it2 - 3; or it = it2 - (-3)
+    Iterator operator-(difference_type n) const { return *this; }
   // it += 3; or it += -3;
   Iterator operator+=(difference_type n) { return *this; }
   // it -= 3; or it -= -3;
@@ -122,7 +122,10 @@ Iterator &operator++() {
   bool operator>(const Iterator &other) const { return false; }
   bool operator<=(const Iterator &other) const { return false; }
   bool operator>=(const Iterator &other) const { return false; }
-
+  
+  pointer get_current() const { return m_current; }
+  BlockItr get_block() const { return m_block; }
+  
   [[nodiscard]] std::string to_string() const {
     std::ostringstream oss;
     oss << "[&block: " << *m_block << ", &current: " << m_current << "]";
@@ -455,39 +458,41 @@ public:
     // Traverse each of the slots in the map of blocks.
     // for (const auto& sptr_blk : (*m_mob)) {
     for (const typename block_list_t::value_type &sptr_blk : (*m_mob)) {
+      oss << "<&block:" << static_cast<const void*>(sptr_blk.get()) << "> ";
       oss << "[" << map_slot_idx++ << "]";
       // Slots in the map that is not in use.
       if (sptr_blk == nullptr) {
         oss << "<null> ";
         continue;
       }
+      
       oss << "{ ";
       // Traverse each item of the data block.
       for (const typename block_t::value_type &item : (*sptr_blk)) {
         // Start showing values only when we reach the front.
-        if (&item == m_front_itr.current) {
+        if (&item == m_front_itr.get_current()) {
           show_values = true;
         }
         // Stop showing values when we reach the back.
-        if (&item == m_back_itr.current) {
+        if (&item == m_back_itr.get_current()) {
           show_values = false;
         }
         if (show_values) {
           oss << item << " ";
         } else {
-          oss << (&item == m_back_itr.current ? "x " : "- ");
+          oss << (&item == m_back_itr.get_current() ? "x " : "- ");
         }
       }
-      oss << "} ";
+      oss << "} \n";
     }
-    auto front_block_idx = std::distance(m_mob->begin(), m_front_itr.block);
-    auto back_block_idx = std::distance(m_mob->begin(), m_back_itr.block);
-    oss << "\n    front blk idx: [" << front_block_idx << "], back blk idx: ["
+    auto front_block_idx = std::distance(m_mob->begin(), m_front_itr.get_block());
+    auto back_block_idx = std::distance(m_mob->begin(), m_back_itr.get_block());
+    oss << "  front blk idx: [" << front_block_idx << "], back blk idx: ["
         << back_block_idx << "]";
     auto last = std::prev(m_back_itr);
-    oss << "\n    *front_ptr: " << *m_front_itr.current
-        << ", *back_ptr: " << *last.current;
-    oss << "\n    size: " << size();
+    oss << "\n *front_ptr: " << *m_front_itr.get_current()
+        << ", *back_ptr: " << *last.get_current();
+    oss << " e size: " << size() <<"\n";
     return oss.str();
   }
 
