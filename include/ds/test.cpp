@@ -77,6 +77,14 @@ int main() {
     auto it3 = 3 + it; // Avança 3 posições
     std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 0
     std::cout << it3.to_string() << "-> value: " << *it3 <<"\n"; // Deve imprimir: 128
+    std::cout << "\n";
+
+    std::cout << "Testando o it - numero:\n";
+    it = d.begin() + 4; // Avança 4 posições
+    auto it4 = it - 3; // Retrocede 3 posições
+    std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 168
+    std::cout << it4.to_string() << "-> value: " << *it4 <<"\n"; // Deve imprimir: 42
+    std::cout << "\n";
 
     return 0;
 }
