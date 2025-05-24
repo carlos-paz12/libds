@@ -117,7 +117,13 @@ Iterator &operator++() {
     return temp; // Retorna o iterador avançado
     }
     // it = it2 - 3; or it = it2 - (-3)
-    Iterator operator-(difference_type n) const { return *this; }
+    Iterator operator-(difference_type n) const { 
+      Iterator temp = *this; //salva estado atual
+      for (difference_type i = 0; i < n; ++i) {
+        --temp; // Retrocede o iterador dentro do bloco atual
+      }
+      return temp; // Retorna o iterador retrocedido
+     }
   // it += 3; or it += -3;
   Iterator operator+=(difference_type n) { return *this; }
   // it -= 3; or it -= -3;
