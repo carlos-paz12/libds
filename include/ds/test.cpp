@@ -113,5 +113,12 @@ int main() {
     std::cout << "Diferença: " << diff << "\n"; // Deve imprimir: 3
     std::cout << "\n";
 
+    std::cout << "Testando o it1 == it2:\n";
+    it = d.begin() + 4; // Avança 4 posições
+    auto it5 = d.begin() + 4; // Avança 4 posições
+    std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 168
+    std::cout << it5.to_string() << "-> value: " << *it5 <<"\n"; // Deve imprimir: 168
+    std::cout << (it == it5 ? "iguais" : "diferentes") << "\n"; // Deve imprimir: iguais
+
     return 0;
 }
