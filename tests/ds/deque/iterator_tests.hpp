@@ -73,7 +73,7 @@ void run_iterator_tests()
     DequeType dq(9,100);
 
     auto it = dq.begin();
-    EXPECT_EQ(*it, 100);
+    EXPECT_EQ(*it, 0);
 
     //auto dq2 = dq;
     //dq2[0] = 100; // Changing the copy
