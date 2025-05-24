@@ -51,5 +51,12 @@ int main() {
     }
     std::cout << "\n";
 
+    std::cout << "Testando o it + numero:\n";
+    it = d.begin();
+    auto it2 = it + 3; // Avança 3 posições
+    std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 42
+    std::cout << it2.to_string() << "-> value: " << *it2 <<"\n"; // Deve imprimir: 42
+    std::cout << "\n";
+
     return 0;
 }
