@@ -161,7 +161,9 @@ Iterator &operator++() {
   bool operator<=(const Iterator &other) const { 
     return (*this < other) or (*this == other);
    }
-  bool operator>=(const Iterator &other) const { return false; }
+  bool operator>=(const Iterator &other) const {
+    return not(*this < other);
+   }
   
   pointer get_current() const { return m_current; } // para o to_string_full
   BlockItr get_block() const { return m_block; } //para o to_string_full
