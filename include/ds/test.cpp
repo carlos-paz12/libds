@@ -4,9 +4,9 @@
  * @author Leandro Andrade (leandro.andrade.401@ufrn.edu.br)
  * @brief  class de testes do Deque sem cmake
  * @version 0.1
- * @date 2025-05-24
+ * @date 202k-0k-24
  * 
- * @copyright Copyright (c) 2025
+ * @copyright Copyright (c) 202k
  * 
  */
 #include "deque.hpp"
@@ -18,7 +18,8 @@ int main() {
   std::cout << de.to_string_full (); // delhalhe do deque
   std::cout << "\n";
   std::cout << "testando o construtor com valor padrão\n";
-  ds::Deque<int> d(5, 42); // Cria deque com 5 elementos iguais a 42 * i, d  = {0, 42, 84, 126, 168 }
+  int k = 5;
+  ds::Deque<int> d(k, 42); // Cria deque com k elementos iguais a 42 * i, d  = {0, 42, 84,..., 42*(k-1)}
   std::cout << d.to_string_full(); // delhalhe do deque
   std::cout << "\n";
 
@@ -26,7 +27,7 @@ int main() {
 
     std::cout << "Testando begin() e pré-incremento (++it):\n";
    //deve imprimir : 0 , 42, 84, 126, 168
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < k; ++i) {
         std::cout << it.to_string() << "-> value: " << *it <<"\n"; 
         ++it;
     }
@@ -36,7 +37,7 @@ int main() {
 
     std::cout << "Testando pós-incremento (it++):\n";
     // deve imprimir : 0 , 42, 84, 126, 168
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < k; ++i) {
         std::cout << it.to_string() << "-> value: " << *it <<"\n"; 
         it++;
     }
@@ -44,11 +45,11 @@ int main() {
 
     // Reposiciona o iterador para o final
     it = d.begin();
-    for (int i = 0; i < 5; ++i) ++it; // avança até o final (equivalente a end())
+    for (int i = 0; i < k; ++i) ++it; // avança até o final (equivalente a end())
 
     std::cout << "Testando pré-decremento (--it):\n";
     // deve imprimir : 168, 126, 84, 42, 0
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < k; ++i) {
         --it;
         std::cout << it.to_string() << "-> value: " << *it <<"\n";
     }
@@ -56,13 +57,16 @@ int main() {
 
     // Reposiciona o iterador para o final novamente
     it = d.begin();
-    for (int i = 0; i < 5; ++i) ++it; // avança até o final (equivalente a end())
+    for (int i = 0; i < k; ++i) ++it; // avança até o final (equivalente a end())
     //deve imprimir : 0 , 42, 84, 126, 168
     std::cout << "Testando pós-decremento (it--):\n";
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < k; ++i) {
         it--;
         std::cout << it.to_string() << "-> value: " << *it <<"\n";
     }
+    std::cout << "\n";
+
+    std::cout << d.to_string_full(); // delhalhe do deque
     std::cout << "\n";
 
     std::cout << "Testando o it + numero:\n";
@@ -98,6 +102,15 @@ int main() {
     std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 168
     it -= 3; // Retrocede 3 posições
     std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 42
+    std::cout << "\n";
+
+    std::cout << "Testando o it - it:\n";
+    it = d.begin() + 4; // Avança 4 posições
+    auto itk = d.begin() + 1; // Avança 1 posição
+    auto diff = it - itk; // Calcula a diferença
+    std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 168
+    std::cout << itk.to_string() << "-> value: " << *itk <<"\n"; // Deve imprimir: 42
+    std::cout << "Diferença: " << diff << "\n"; // Deve imprimir: 3
     std::cout << "\n";
 
     return 0;
