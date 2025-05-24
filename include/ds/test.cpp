@@ -2,13 +2,20 @@
 #include <iostream>
 
 int main() {
-    ds::Deque<int> d(5, 42); // Cria deque com 5 elementos iguais a 42
+  std::cout << "testando o construtor padrão\n";
+  ds::Deque<int> de; // Cria deque vazio
+  std::cout << de.to_string_full ();
+  std::cout << "\n";
+  std::cout << "testando o construtor com valor padrão\n";
+  ds::Deque<int> d(5, 42); // Cria deque com 5 elementos iguais a 42
+  std::cout << d.to_string_full();
+  std::cout << "\n";
 
     auto it = d.begin();     // Iterador para o primeiro elemento
 
     std::cout << "Testando begin() e pré-incremento (++it):\n";
     for (int i = 0; i < 5; ++i) {
-        std::cout << *it << ' '; // Deve imprimir: 42 42 42 42 42
+        std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 42 42 42 42 42
         ++it;
     }
     std::cout << "\n";
@@ -17,7 +24,7 @@ int main() {
 
     std::cout << "Testando pós-incremento (it++):\n";
     for (int i = 0; i < 5; ++i) {
-        std::cout << *it << ' '; // Deve imprimir: 42 42 42 42 42
+        std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 42 42 42 42 42
         it++;
     }
     std::cout << "\n";
@@ -29,7 +36,7 @@ int main() {
     std::cout << "Testando pré-decremento (--it):\n";
     for (int i = 0; i < 5; ++i) {
         --it;
-        std::cout << *it << ' '; // Deve imprimir: 42 42 42 42 42
+        std::cout << it.to_string() << "-> value: " << *it <<"\n";// Deve imprimir: 42 42 42 42 42
     }
     std::cout << "\n";
 
@@ -40,7 +47,7 @@ int main() {
     std::cout << "Testando pós-decremento (it--):\n";
     for (int i = 0; i < 5; ++i) {
         it--;
-        std::cout << *it << ' '; // Deve imprimir: 42 42 42 42 42
+        std::cout << it.to_string() << "-> value: " << *it <<"\n";// Deve imprimir: 42 42 42 42 42
     }
     std::cout << "\n";
 
