@@ -101,7 +101,13 @@ Iterator &operator++() {
     return temp;           // retorna o iterador antigo
   }
   // it = it2 + 3; or it = it2 + (-3)
-  Iterator operator+(difference_type n) const { return *this; }
+  Iterator operator+(difference_type n) const { 
+    Iterator temp = *this; //salva estado atual
+    for (difference_type i = 0; i < n; ++i) {
+      ++temp; // Avança o iterador dentro do bloco atual
+    }
+    return temp; // Retorna o iterador avançado
+  }
   // it = 3 + it2; or it = (-3) + it2
   friend Iterator operator+(Iterator::difference_type n,
     const Iterator &other) {
@@ -125,7 +131,7 @@ Iterator &operator++() {
   
   pointer get_current() const { return m_current; }
   BlockItr get_block() const { return m_block; }
-  
+
   [[nodiscard]] std::string to_string() const {
     std::ostringstream oss;
     oss << "[&block: " << *m_block << ", &current: " << m_current << "]";
