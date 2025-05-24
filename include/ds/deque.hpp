@@ -145,7 +145,9 @@ Iterator &operator++() {
     return diff; // Retorna a diferença total
    }
 
-  bool operator==(const Iterator &other) const { return false; }
+  bool operator==(const Iterator &other) const { 
+    return (m_current == other.m_current) and (m_block == other.m_block);
+  }
   bool operator!=(const Iterator &other) const { return false; }
   bool operator<(const Iterator &other) const { return false; }
   bool operator>(const Iterator &other) const { return false; }
