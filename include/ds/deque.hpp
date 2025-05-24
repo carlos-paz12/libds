@@ -125,7 +125,10 @@ Iterator &operator++() {
       return temp; // Retorna o iterador retrocedido
      }
   // it += 3; or it += -3;
-  Iterator operator+=(difference_type n) { return *this; }
+  Iterator operator+=(difference_type n) { 
+    *this = *this + n; // Chama o operador de soma
+    return *this; // Retorna o iterador atualizado
+   }
   // it -= 3; or it -= -3;
   Iterator operator-=(difference_type n) { return *this; }
   // it = it2 - it3;
