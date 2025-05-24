@@ -137,5 +137,13 @@ int main() {
     std::cout << (it < it7 ? "menor" : "maior ou igual") << "\n"; // Deve imprimir: maior ou igual
     std::cout << "\n";
 
+    std::cout << "Testando o it1 > it2:\n";
+    it = d.begin() + 4; // Avança 4 posições
+    auto it8 = d.begin() + 1; // Avança 1 posição
+    std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 168
+    std::cout << it8.to_string() << "-> value: " << *it8 <<"\n"; // Deve imprimir: 42
+    std::cout << (it > it8 ? "maior" : "menor ou igual") << "\n"; // Deve imprimir: maior
+    std::cout << "\n";
+
     return 0;
 }
