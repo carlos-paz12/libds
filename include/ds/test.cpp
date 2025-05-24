@@ -119,6 +119,15 @@ int main() {
     std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 168
     std::cout << it5.to_string() << "-> value: " << *it5 <<"\n"; // Deve imprimir: 168
     std::cout << (it == it5 ? "iguais" : "diferentes") << "\n"; // Deve imprimir: iguais
+    std::cout << "\n";
+
+    std::cout << "Testando o it1 != it2:\n";
+    it = d.begin() + 4; // Avança 4 posições
+    auto it6 = d.begin() + 1; // Avança 1 posição
+    std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 168
+    std::cout << it6.to_string() << "-> value: " << *it6 <<"\n"; // Deve imprimir: 42
+    std::cout << (it != it6 ?  "diferentes" : "iguais") << "\n"; // Deve imprimir: diferentes
+    std::cout << "\n";
 
     return 0;
 }
