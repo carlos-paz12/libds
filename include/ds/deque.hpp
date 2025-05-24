@@ -136,7 +136,15 @@ Iterator &operator++() {
    }
   // it = it2 - it3;
   // The *this iterator is usually the farther iterator (down the Deque).
-  difference_type operator-(const Iterator &other) const { return 0; }
+  difference_type operator-(const Iterator &other) const { 
+    // Calcula a diferença entre os iteradores
+    difference_type diff = std::distance(other.m_block, this->m_block);
+    diff *= BlockSize; // Multiplica pela capacidade do bloco
+    diff += std::distance((*other.m_block)->begin(), other.m_current); // recalcula a diferença entre os iteradores
+    diff -= std::distance((*m_block)->begin(), this->m_current); // recalcula a diferença entre os iteradores
+    return diff; // Retorna a diferença total
+   }
+
   bool operator==(const Iterator &other) const { return false; }
   bool operator!=(const Iterator &other) const { return false; }
   bool operator<(const Iterator &other) const { return false; }
