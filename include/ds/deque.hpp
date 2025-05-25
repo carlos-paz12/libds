@@ -46,6 +46,11 @@ public:
   /// Default constructor.
   Iterator() : m_block(), m_current() {}
 
+  /// Copy constructor (permite conversão de não-const para const)
+  template <typename OtherBlockItr, typename OtherItemItr>
+  Iterator(const Iterator<T, BlockSize, OtherBlockItr, OtherItemItr> &other)
+      : m_block(other.m_block), m_current(other.m_current) {}
+
   /// Useful constructor.
   Iterator(BlockItr block, ItemItr current)
       : m_block(block), m_current(current) {}
@@ -137,17 +142,17 @@ public:
   // it = it2 - it3;
   // The *this iterator is usually the farther iterator (down the Deque).
   difference_type operator-(const Iterator &other) const {
-    // Calcula a diferença entre os iteradores
-    difference_type diff = std::distance(other.m_block, this->m_block);
-    diff *= BlockSize; // Multiplica pela capacidade do bloco
-    diff += std::distance(
-        (*other.m_block)->begin(),
-        other.m_current); // recalcula a diferença entre os iteradores
-    diff -= std::distance(
-        (*m_block)->begin(),
-        this->m_current); // recalcula a diferença entre os iteradores
-    return diff;          // Retorna a diferença total
+    // Diferença de blocos
+    difference_type block_diff = std::distance(other.m_block, this->m_block);
+    block_diff *= BlockSize;
+  
+    // Diferença dentro dos blocos
+    difference_type this_offset = std::distance((*m_block)->begin(), m_current);
+    difference_type other_offset = std::distance((*other.m_block)->begin(), other.m_current);
+  
+    return block_diff + (this_offset - other_offset);
   }
+  
 
   bool operator==(const Iterator &other) const {
     return (m_current == other.m_current) and (m_block == other.m_block);
@@ -445,13 +450,25 @@ public:
   /// Return an iterator to a location following the Deque's last element.
   iterator end() { return iterator(m_back_itr); }
   /// Return a const iterator to the Deque's first element.
-  const_iterator cbegin() const {}
+  const_iterator cbegin() const {
+    return const_iterator(m_front_itr.m_block, m_front_itr.m_current);
+  }
 
   /// Return a const iterator to a location following the Deque's last element.
-  const_iterator cend() const {}
+  const_iterator cend() const {
+    return const_iterator(m_back_itr.m_block, m_back_itr.m_current);
+  }
 
   /// Remove all elements from the Deque.
-  void clear() {}
+  void clear() {
+    // Limpa todos os blocos
+    for (auto &block : *m_mob) {
+      block->fill(T()); // Preenche o bloco com valores padrão
+    }
+    m_count = 0; // Zera a contagem
+    m_front_itr = iterator(m_mob->begin(), (*m_mob)[0]->begin());
+    m_back_itr = iterator(m_mob->begin(), (*m_mob)[0]->begin());
+  }
 
   /// Insert `value` at the beginning of the Deque.
   void push_front(const_reference value) { insert(cbegin(), value); }
@@ -490,7 +507,16 @@ public:
   /// Returns a const ref. to the element at specified location pos.
   /*! No bounds checking is performed.
    */
-  const_reference operator[](size_type idx) const {}
+  const_reference operator[](size_type idx) const {
+    // [0] Check if the index is within bounds.
+    if (idx >= m_count) {
+      throw std::out_of_range("Deque::operator[]: index out of range");
+    }
+    // [1] Calculate the block and position inside the block.
+    size_type block_index{idx / BlockSize};
+    size_type pos_in_block{idx % BlockSize};
+    return (*(*m_mob)[block_index])[pos_in_block];
+  }
 
   /// Returns a reference to the element at specified location `pos`.i
   /*! This method checks the bounds and may throw std::out_of_range,
