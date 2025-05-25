@@ -389,7 +389,40 @@ m_count = c; // Atualiza a contagem
 
   }
 
-  Deque &operator=(const Deque &other) {}
+  Deque &operator=(const Deque &other) {
+    if (this != &other) {
+      size_type mob_size {other.m_mob->size()}; // Número de blocos alocados
+      m_mob = std::make_unique<block_list_t>(mob_size);
+    
+      // Aloca e copia os blocos
+      for (size_type i = 0; i < mob_size; ++i) {
+        (*m_mob)[i] = std::make_shared<block_t>();
+        std::copy( (*other.m_mob)[i]->begin(), (*other.m_mob)[i]->end(), 
+            (*m_mob)[i]->begin()
+        ); // Copia os elementos do bloco
+      }
+    
+      // Recalcula a distância entre m_mob->begin() e os iteradores do other
+      auto front_blk_index {other.m_front_itr.m_block - other.m_mob->begin()}; //faz o calculo da distância entre o bloco inicial e o bloco atual
+      auto back_blk_index  {other.m_back_itr.m_block  - other.m_mob->begin()};// faz o calculo da distância entre o bloco inicial e o bloco atual
+      // Recalcula a posição dentro do bloco
+      auto front_pos {other.m_front_itr.m_current - (*other.m_front_itr.m_block)->begin()}; //valor da posição dentro do bloco
+      auto back_pos  {other.m_back_itr.m_current  - (*other.m_back_itr.m_block)->begin()}; //valor da posição dentro do bloco
+    
+      // Cria novos iteradores com base nos blocos da nova m_mob
+      m_front_itr = iterator(
+          m_mob->begin() + front_blk_index,
+          (*m_mob)[front_blk_index]->begin() + front_pos
+      ); //iterador para o bloco do início
+    
+      m_back_itr = iterator(
+          m_mob->begin() + back_blk_index,
+          (*m_mob)[back_blk_index]->begin() + back_pos
+      ); //iterador para o bloco do fim
+      m_count = other.m_count; // Atualiza a contagem
+    }
+    return *this;
+  }
 
   /// Return the number of elements in the Deque.
   [[nodiscard]] size_type size() const { return m_count; }
