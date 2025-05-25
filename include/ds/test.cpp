@@ -27,6 +27,11 @@ void test_Constructs(){
     ds::Deque<int> d2(d1.begin(), d1.end()); // Cria deque a partir do deque d1
     std::cout << d2.to_string_full(); // delhalhe do deque
     std::cout << "\n\n";
+
+    std::cout << "Testando o construtor de copia:\n";
+    ds::Deque<int> d3(d2); // Cria deque a partir do deque d2
+    std::cout << d3.to_string_full(); // delhalhe do deque
+    std::cout << "\n\n";
    
 }
 void test_Iterators(){
