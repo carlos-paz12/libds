@@ -304,8 +304,8 @@ m_front_itr = iterator(
         ->begin() // iterador para a posição inicial dentro do bloco
 );
 
-iterator it = m_front_itr;
-int c = 0;
+iterator it{m_front_itr};
+int c{0};
 // Preenche os elementos com os valores do intervalo [first, last)
 for (auto i = first; i != last; ++i, ++it) {*it = *i;
   ++c;
@@ -351,7 +351,43 @@ m_count = c; // Atualiza a contagem
   
 
   /// Initializer list Ctro.
-  Deque(const std::initializer_list<T> &il) {}
+  Deque(const std::initializer_list<T> &il) {
+    size_type n{static_cast<size_type>(il.size())}; // Número de elementos no intervalo
+
+    // Número de blocos necessários para armazenar n elementos
+    size_type blocks_needed{ (n + BlockSize -1 ) / BlockSize };
+
+    // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
+    size_type map_size{blocks_needed + 2}; // adiciona 2 blocos extra
+    // Inicializa o vetor de blocos com ponteiros nulos
+    m_mob = std::make_unique<block_list_t>(map_size);
+    // Aloca os blocos
+    for (size_type i{0}; i < map_size; ++i) {
+      (*m_mob)[i] = std::make_shared<block_t>(); // O tamanho do bloco está
+                                                 // definido em `block_t`.
+    }
+    // Posição central onde os dados começarão
+    size_type start_block{1};
+    // Inicializa iterador para o início (posição lógica 0)
+    m_front_itr = iterator(
+        m_mob->begin() + start_block, // iterador para o bloco do início
+        (*m_mob)[start_block]
+            ->begin() // iterador para a posição inicial dentro do bloco
+    );
+
+    auto it{m_front_itr};
+    int c{0};
+    // Preenche os elementos com os valores do intervalo [first, last)
+    for (auto i : il) {
+      *(it) = i ;
+      ++it;
+      ++c;
+    }
+    m_back_itr = it; // aponta para uma posição além do último
+    // Atualiza a contagem
+    m_count = c;
+
+  }
 
   Deque &operator=(const Deque &other) {}
 
