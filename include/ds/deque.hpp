@@ -695,9 +695,8 @@ public:
     auto back_block_idx = std::distance(m_mob->begin(), m_back_itr.get_block());
     oss << "  front blk idx: [" << front_block_idx << "], back blk idx: ["
         << back_block_idx << "]";
-    auto last = std::prev(m_back_itr);
-    oss << "\n *front_ptr: " << *m_front_itr.m_current
-        << ", *back_ptr: " << *last.get_current();
+        oss << "\n *front_ptr: " << *m_front_itr.get_current()
+        << ", *back_ptr: " << *(m_back_itr - 1).get_current();    
     oss << " e size: " << size() << "\n";
     return oss.str();
   }
