@@ -214,7 +214,7 @@ public:
   /// Default Ctro.
   Deque() {
     // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
-    size_type map_size{DefaultBlkMapSize}; // 2 extras: frente e trás
+    size_type map_size{DefaultBlkMapSize}; 
     // Inicializa o vetor de blocos com ponteiros nulos
     m_mob = std::make_unique<block_list_t>(map_size);
 
@@ -226,22 +226,17 @@ public:
 
     // Posição central onde os dados começarão
     size_type start_block{1};
-
     // Inicializa iterador para o início (posição lógica 0)
-    m_front_itr = iterator(
-        m_mob->begin() + start_block, // iterador para o bloco do início
-        (*m_mob)[start_block]
-            ->begin() // iterador para a posição inicial dentro do bloco
-    );
-
-    // Inicializa iterador para o fim
-    size_type end_block{start_block + DefaultBlkMapSize};
-    size_type offset{DefaultBlkMapSize % BlockSize};
-
-    m_back_itr = iterator(
-        m_mob->begin() + end_block, // iterador para o último bloco com dados
-        (*m_mob)[end_block]->begin() + offset // posição dentro do bloco
-    );
+  m_front_itr = iterator(
+      m_mob->begin() + start_block,
+      (*m_mob)[start_block]->begin()
+  );
+  // Inicializa iterador para o fim (posição lógica 0)
+  size_type end_block{start_block + 1};
+  m_back_itr = iterator(
+      m_mob->begin() + end_block,
+      (*m_mob)[end_block]->begin()
+  );
   }
 
   /*! Construct a Deque and initialize it with `n` copies of `value` of type
@@ -253,7 +248,7 @@ public:
         static_cast<size_type>(std::ceil((n + BlockSize - 1) / BlockSize))};
 
     // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
-    size_type map_size{blocks_needed + 2}; // 2 extras: frente e trás
+    size_type map_size{blocks_needed+2}; // adiciona 2 blocos extra
     // Inicializa o vetor de blocos com ponteiros nulos
     m_mob = std::make_unique<block_list_t>(map_size);
     // Aloca os blocos
@@ -269,24 +264,14 @@ public:
         (*m_mob)[start_block]
             ->begin() // iterador para a posição inicial dentro do bloco
     );
-    // Inicializa iterador para o fim
-    size_type end_block{start_block + (blocks_needed ? blocks_needed - 1 : 0)};
-    size_type offset{
-        (n == 0) ? n
-                 : (n - 1) % BlockSize}; /// @todo para que serve o `offset`.
-
-    m_back_itr = iterator(
-        m_mob->begin() + end_block, // iterador para o último bloco com dados
-        (*m_mob)[end_block]->begin() + offset // posição dentro do bloco
-    );
 
     // Preenche os elementos com 'value'
     iterator it{m_front_itr};
     for (size_type i = 0; i < n; ++i) {
-      *(it) = value * i; // remover o * i depois...
+      *(it) = value ;
       ++it;
     }
-
+    m_back_itr = it; // aponta para uma posição além do último
     // Atualiza a contagem
     m_count = n;
   }
@@ -310,6 +295,17 @@ public:
 
   /// Return `true` if the Deque has no elements, `false` otherwise.
   [[nodiscard]] bool empty() const { return m_count == 0; }
+
+   /// Return an iterator to the Deque's first element.
+ iterator begin() { return iterator(m_front_itr); }
+
+ /// Return an iterator to a location following the Deque's last element.
+ iterator end()   { return iterator(m_back_itr); }
+ /// Return a const iterator to the Deque's first element.
+ const_iterator cbegin() const {}
+
+ /// Return a const iterator to a location following the Deque's last element.
+ const_iterator cend() const {}
 
   /// Remove all elements from the Deque.
   void clear() {}
@@ -373,16 +369,7 @@ public:
   /// Deletes unused slots.
   void shrink_to_fit() {}
 
-  /// Return an iterator to the Deque's first element.
- iterator begin() { return iterator(m_front_itr); }
-
-  /// Return an iterator to a location following the Deque's last element.
-  iterator end()   { return iterator(m_back_itr); }
-  /// Return a const iterator to the Deque's first element.
-  const_iterator cbegin() const {}
-
-  /// Return a const iterator to a location following the Deque's last element.
-  const_iterator cend() const {}
+ 
 
   /// Inserts `value` before `cpos`.
   iterator insert(const_iterator cpos, const T &value) {}
@@ -532,7 +519,7 @@ public:
     oss << "  front blk idx: [" << front_block_idx << "], back blk idx: ["
         << back_block_idx << "]";
     auto last = std::prev(m_back_itr);
-    oss << "\n *front_ptr: " << *m_front_itr.get_current()
+    oss << "\n *front_ptr: " << *m_front_itr.m_current
         << ", *back_ptr: " << *last.get_current();
     oss << " e size: " << size() <<"\n";
     return oss.str();
@@ -559,17 +546,17 @@ public:
       // for (const auto& item : (*sptr_blk)) {
       for (const typename block_t::value_type &item : (*sptr_blk)) {
         // Turn show numbers on when we reach the front.
-        if (&item == m_front_itr.current) {
+        if (&item == m_front_itr.get_current()) {
           show_values = true;
         }
         // Turn show number off when we reach the back.
-        if (&item == m_back_itr.current) {
+        if (&item == m_back_itr.get_current()) {
           show_values = false;
         }
         if (show_values) {
           oss << item << " ";
         } else {
-          oss << (&item == m_back_itr.current ? "x " : "- ");
+          oss << (&item == m_back_itr.get_current() ? "x " : "- ");
         }
       }
     }
