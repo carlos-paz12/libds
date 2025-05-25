@@ -11,22 +11,34 @@
  */
 #include "deque.hpp"
 #include <iostream>
+void test_Constructs(){
+    std::cout << "===============Constructs=======================\n";
+    std::cout << "testando o construtor padrão\n";
+    ds::Deque<int> d0; // Cria deque vazio
+    std::cout << d0.to_string_full (); // delhalhe do deque
+    std::cout << "\n\n";
 
-int main() {
-  std::cout << "testando o construtor padrão\n";
-  ds::Deque<int> de; // Cria deque vazio
-  std::cout << de.to_string_full (); // delhalhe do deque
-  std::cout << "\n";
-  std::cout << "testando o construtor com valor padrão\n";
-  int k = 5;
-  ds::Deque<int> d(k, 42); // Cria deque com k elementos iguais a 42 * i, d  = {0, 42, 84,..., 42*(k-1)}
+    std::cout << "Testando o construtor com valor padrão\n";
+    ds::Deque<int> d1(9, 100); // Cria deque com 9 elementos iguais a 100
+    std::cout << d1.to_string_full(); // delhalhe do deque
+    std::cout << "\n\n";
+  
+    std::cout << "Testando o  construtor de incio/fim:\n";
+    ds::Deque<int> d2(d1.begin(), d1.end()); // Cria deque a partir do deque d1
+    std::cout << d2.to_string_full(); // delhalhe do deque
+    std::cout << "\n\n";
+   
+}
+void test_Iterators(){
+    std::cout << "===============Iterators========================\n\n";
+  int k = 9;
+  ds::Deque<int> d(k, 100); // Cria deque com k elementos iguais a 100}
+  std::cout << "Deque para os testes:\n";
   std::cout << d.to_string_full(); // delhalhe do deque
   std::cout << "\n";
+   auto it = d.begin();     // Iterador para o primeiro elemento
 
-    auto it = d.begin();     // Iterador para o primeiro elemento
-
-    std::cout << "Testando begin() e pré-incremento (++it):\n";
-   //deve imprimir : 0 , 42, 84, 126, 168
+    std::cout << "Testando pré-incremento (++it):\n";
     for (int i = 0; i < k; ++i) {
         std::cout << it.to_string() << "-> value: " << *it <<"\n"; 
         ++it;
@@ -36,29 +48,24 @@ int main() {
     it = d.begin(); // Reseta o iterador
 
     std::cout << "Testando pós-incremento (it++):\n";
-    // deve imprimir : 0 , 42, 84, 126, 168
     for (int i = 0; i < k; ++i) {
         std::cout << it.to_string() << "-> value: " << *it <<"\n"; 
         it++;
     }
     std::cout << "\n";
 
-    // Reposiciona o iterador para o final
-    it = d.begin();
-    for (int i = 0; i < k; ++i) ++it; // avança até o final (equivalente a end())
+
+     it = d.end(); // Iterador para o último elemento
 
     std::cout << "Testando pré-decremento (--it):\n";
-    // deve imprimir : 168, 126, 84, 42, 0
+    
     for (int i = 0; i < k; ++i) {
         --it;
         std::cout << it.to_string() << "-> value: " << *it <<"\n";
     }
     std::cout << "\n";
 
-    // Reposiciona o iterador para o final novamente
-    it = d.begin();
-    for (int i = 0; i < k; ++i) ++it; // avança até o final (equivalente a end())
-    //deve imprimir : 0 , 42, 84, 126, 168
+    it = d.end (); // Iterador para o último elemento
     std::cout << "Testando pós-decremento (it--):\n";
     for (int i = 0; i < k; ++i) {
         it--;
@@ -159,8 +166,11 @@ int main() {
     std::cout << it.to_string() << "-> value: " << *it <<"\n"; // Deve imprimir: 168
     std::cout << it10.to_string() << "-> value: " << *it10 <<"\n"; // Deve imprimir: 168
     std::cout << (it >= it10 ? "maior ou igual" : "menor") << "\n"; // Deve imprimir: maior ou igual
-    std::cout << "\n";
-
-
+    
+}
+int main() {
+    std::cout << "================DEQUE OF TESTS==================\n\n";
+   // test_Iterators();
+   test_Constructs();
     return 0;
 }
