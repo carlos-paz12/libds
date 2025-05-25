@@ -42,7 +42,8 @@ void test_Constructs(){
     ds::Deque<int> d5 = d4; // Cria deque a partir de uma lista de inicialização
     std::cout << d5.to_string_full(); // delhalhe do deque
     std::cout << "\n\n";
-    
+
+   
 }
 void test_Iterators(){
     std::cout << "===============Iterators========================\n\n";
@@ -183,9 +184,45 @@ void test_Iterators(){
     std::cout << (it >= it10 ? "maior ou igual" : "menor") << "\n"; // Deve imprimir: maior ou igual
     
 }
+void test_methods(){
+    std::cout << "===============Methods========================\n\n";
+    ds::Deque<int> d(9, 100); // Cria deque com 9 elementos iguais a 100
+    std::cout << d.to_string_full(); // delhalhe do deque
+    std::cout << "\n";
+    std::cout << "Testando o método front():\n";
+    std::cout << d.front() << "\n"; // Deve imprimir: 100
+    std::cout << "\n";
+
+    std::cout << "Testando o método back():\n";
+    std::cout << d.back() << "\n"; // Deve imprimir: 100
+    std::cout << "\n";
+
+    std::cout << "Testando o método size():\n";
+    std::cout << d.size() << "\n"; // Deve imprimir: 9
+    std::cout << "\n";
+    
+    std::cout << "Testando operador[]:\n";
+    for(auto i =d.begin(); i != d.end(); ++i){
+        std::cout << i.to_string() << "-> value: " << *i <<"\n";
+    }
+    std::cout << "\n";
+
+    std::cout << "Testando o método empty():\n";
+    std::cout << (d.empty() ? "vazio" : "não vazio") << "\n"; // Deve imprimir: não vazio
+    std::cout << "\n";
+
+    std::cout << "Testando o método clear():\n";
+    d.clear(); // Limpa o deque
+    std::cout << (d.empty() ? "vazio" : "não vazio") << "\n"; // Deve imprimir: vazio
+    std::cout << "\n";
+
+   
+
+}
 int main() {
     std::cout << "================DEQUE OF TESTS==================\n\n";
    // test_Iterators();
-   test_Constructs();
+    test_Constructs();
+    test_methods();
     return 0;
 }

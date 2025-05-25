@@ -19,80 +19,78 @@
 #define BEGIN YES
 // Test cbegin() method that should return a const iterator to the first element
 // in the container.
-#define CBEGIN NO
+#define CBEGIN YES
 // Test end() method that should return a iterator to a location just past the
 // last elemento of a container.
 #define END YES
 // Test cend() method that should return a const iterator to a location just
 // past the last elemento of a container.
-#define CEND NO
+#define CEND YES
 // Pre-increment operator. ++it
-#define PRE_INC NO
+#define PRE_INC YES
 // Post-increment operator. it++
-#define POST_INC NO
+#define POST_INC YES
 // Pre-decrement operator. --it
-#define PRE_DEC NO
+#define PRE_DEC YES
 // Post-decrement operator. it--
-#define POST_DEC NO
+#define POST_DEC YES
 // Dreference operator. *it
-#define DEREFERENCE NO
+#define DEREFERENCE YES
 // Differentre between iterators. it1 - it2
-#define DIFFERENCE NO
+#define DIFFERENCE YES
 // Add a offset to a iterator. offset + it
-#define ADD_OFFSET_IT NO
+#define ADD_OFFSET_IT YES
 // Add an iterator and an offset. it + offset
-#define ADD_IT_OFFSET NO
+#define ADD_IT_OFFSET YES
 // Subtract an iterator and an offset. it - offset
-#define SUB_IT_OFFSET NO
+#define SUB_IT_OFFSET YES
 // Self addition iterator and offset. it += 0ffset
-#define SELF_ADD_IT_OFFSET NO
+#define SELF_ADD_IT_OFFSET YES
 // Self subtraction iterator and offset. it -= 0ffset
-#define SELF_SUB_IT_OFFSET NO
+#define SELF_SUB_IT_OFFSET YES
 // Less operator. it1 < it2
-#define LESS NO
+#define LESS YES
 // Greater operator. it1 > it2
-#define GREATER NO
+#define GREATER YES
 // Less equal operator. it1 <= it2
-#define LESS_EQ NO
+#define LESS_EQ YES
 // Greater equal operator. it1 >= it2
-#define GREATER_EQ NO
+#define GREATER_EQ YES
 // Equal operator. it1 == it2
-#define EQUAL NO
+#define EQUAL YES
 // Different operator. it1 != it2
-#define DIFFERENT NO
+#define DIFFERENT YES
 
 template <typename DequeType>
 void run_iterator_tests()
 {
   TestManager tm{"Iterator testing"};
-  DequeType dq(9,100);
-  std::cout << dq.to_string_full();
-
+ 
 #if BEGIN
   {
     BEGIN_TEST(tm, "begin", "dq.begin()");
 
-   // DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{1, 2, 4, 5};
 
     auto it = dq.begin();
-    std::cout << "begin = " << *it << "\n";
-    EXPECT_EQ(*it, 0); // coloar o 1 depois...
+    EXPECT_EQ (*it, dq[0]);
 
-    //auto dq2 = dq;
-    //dq2[0] = 100; // Changing the copy
-    //it = dq2.begin();
-    //EXPECT_NE(*it, dq[0]);
-    //EXPECT_EQ(*it, dq2[0]);
+    DequeType dq2(9,200);    
+    dq2[0] = 100; // Changing the copy
 
-    //auto dq3{dq};
-    //dq3[0] = 200; // Changing the copy
-    //it = dq3.begin();
-    //EXPECT_NE(*it, dq[0]);
-    //EXPECT_EQ(*it, dq3[0]);
+    it = dq2.begin();
+    EXPECT_NE(*it, dq[0]);
+    EXPECT_EQ(*it, dq2[0]);
 
-    //DequeType vec4 = {1, 2, 4, 5, 6};
-    //it = vec4.begin();
-    //EXPECT_EQ(*it, vec4[0]);
+    auto dq3{dq};
+    dq3[0] = 200; // Changing the copy
+    it = dq3.begin();
+    EXPECT_NE(*it, dq[0]);
+    EXPECT_EQ(*it, dq3[0]);
+
+    DequeType vec4 = {1, 2, 4, 5, 6};
+    it = vec4.begin();
+    EXPECT_EQ(*it, vec4[0]);
   }
 #endif
 
@@ -127,30 +125,24 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "end", "dq.end()");
 
-    auto it = dq.end();
-    std::cout << "end  = " << *it << "\n";
+    DequeType dq{1, 2, 4, 5, 6};
+
+    auto it = dq.begin() + dq.size();
     EXPECT_EQ(it, dq.end());
-    //DequeType dq{1, 2, 4, 5, 6};
 
-    // auto len = std::distance(dq.begin(), dq.end());
-    // EXPECT_EQ(len, 5);
+    auto dq2 = dq;
+    it = dq2.end();
+    EXPECT_NE(it, dq.end());
+    EXPECT_EQ(it, dq2.end());
 
-    // auto it = dq.begin() + dq.size();
-    // EXPECT_EQ(it, dq.end());
+    auto dq3{dq};
+    it = dq3.end();
+    EXPECT_NE(it, dq.end());
+    EXPECT_EQ(it, dq3.end());
 
-    // auto dq2 = dq;
-    // it = dq2.end();
-    // EXPECT_NE(it, dq.end());
-    // EXPECT_EQ(it, dq2.end());
-
-    // auto dq3{dq};
-    // it = dq3.end();
-    // EXPECT_NE(it, dq.end());
-    // EXPECT_EQ(it, dq3.end());
-
-    // DequeType vec4 = {1, 2, 4, 5, 6};
-    // it = vec4.end();
-    // EXPECT_EQ(it, vec4.end());
+    DequeType vec4 = {1, 2, 4, 5, 6};
+    it = vec4.end();
+    EXPECT_EQ(it, vec4.end());
   }
 #endif
 
