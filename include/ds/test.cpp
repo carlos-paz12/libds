@@ -32,11 +32,17 @@ void test_Constructs(){
     ds::Deque<int> d3(d2); // Cria deque a partir do deque d2
     std::cout << d3.to_string_full(); // delhalhe do deque
     std::cout << "\n\n";
+
     std::cout << "Testando o construtor de lista de inicialização:\n";
     ds::Deque<int> d4{1, 2, 3, 4, 5,6,7,8,9}; // Cria deque a partir de uma lista de inicialização
     std::cout << d4.to_string_full(); // delhalhe do deque
     std::cout << "\n\n";
-   
+
+    std::cout << "Testando o construtor de receber:\n";
+    ds::Deque<int> d5 = d4; // Cria deque a partir de uma lista de inicialização
+    std::cout << d5.to_string_full(); // delhalhe do deque
+    std::cout << "\n\n";
+    
 }
 void test_Iterators(){
     std::cout << "===============Iterators========================\n\n";
