@@ -1,10 +1,6 @@
 #ifndef _DEQUE_ITERATOR_TESTS_HPP_
 #define _DEQUE_ITERATOR_TESTS_HPP_
 
-#include <deque>
-#include <iostream>
-
-#include "ds/deque.hpp"
 #include "test_manager.hpp"
 
 #define YES 1
@@ -61,34 +57,35 @@
 // Different operator. it1 != it2
 #define DIFFERENT YES
 
-template <typename DequeType>
-void run_iterator_tests()
+template<typename DequeType>
+void
+run_iterator_tests()
 {
-  TestManager tm{"Iterator testing"};
- 
+  TestManager tm{ "Iterator testing" };
+
 #if BEGIN
   {
     BEGIN_TEST(tm, "begin", "dq.begin()");
 
-    DequeType dq{1, 2, 4, 5};
+    DequeType dq{ 1, 2, 4, 5 };
 
     auto it = dq.begin();
-    EXPECT_EQ (*it, dq[0]);
+    EXPECT_EQ(*it, dq[0]);
 
-    DequeType dq2(9,200);    
+    DequeType dq2(9, 200);
     dq2[0] = 100; // Changing the copy
 
     it = dq2.begin();
     EXPECT_NE(*it, dq[0]);
     EXPECT_EQ(*it, dq2[0]);
 
-    auto dq3{dq};
+    auto dq3{ dq };
     dq3[0] = 200; // Changing the copy
     it = dq3.begin();
     EXPECT_NE(*it, dq[0]);
     EXPECT_EQ(*it, dq3[0]);
 
-    DequeType vec4 = {1, 2, 4, 5, 6};
+    DequeType vec4 = { 1, 2, 4, 5, 6 };
     it = vec4.begin();
     EXPECT_EQ(*it, vec4[0]);
   }
@@ -98,7 +95,7 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "cbegin", "dq.cbegin()");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto cit = dq.cbegin();
     EXPECT_EQ(*cit, dq[0]);
@@ -109,13 +106,13 @@ void run_iterator_tests()
     EXPECT_NE(*cit, dq[0]);
     EXPECT_EQ(*cit, dq2[0]);
 
-    auto dq3{dq};
+    auto dq3{ dq };
     dq3[0] = 200; // Changing the copy
     cit = dq3.cbegin();
     EXPECT_NE(*cit, dq[0]);
     EXPECT_EQ(*cit, dq3[0]);
 
-    DequeType vec4 = {1, 2, 4, 5, 6};
+    DequeType vec4 = { 1, 2, 4, 5, 6 };
     cit = vec4.cbegin();
     EXPECT_EQ(*cit, vec4[0]);
   }
@@ -125,7 +122,7 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "end", "dq.end()");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = dq.begin() + dq.size();
     EXPECT_EQ(it, dq.end());
@@ -135,12 +132,12 @@ void run_iterator_tests()
     EXPECT_NE(it, dq.end());
     EXPECT_EQ(it, dq2.end());
 
-    auto dq3{dq};
+    auto dq3{ dq };
     it = dq3.end();
     EXPECT_NE(it, dq.end());
     EXPECT_EQ(it, dq3.end());
 
-    DequeType vec4 = {1, 2, 4, 5, 6};
+    DequeType vec4 = { 1, 2, 4, 5, 6 };
     it = vec4.end();
     EXPECT_EQ(it, vec4.end());
   }
@@ -150,7 +147,7 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "cend", "dq.cend()");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = dq.cend();
     EXPECT_EQ(it, dq.cend());
@@ -160,12 +157,12 @@ void run_iterator_tests()
     EXPECT_NE(it, dq.cend());
     EXPECT_EQ(it, dq2.cend());
 
-    auto dq3{dq};
+    auto dq3{ dq };
     it = dq3.cend();
     EXPECT_NE(it, dq.cend());
     EXPECT_EQ(it, dq3.cend());
 
-    DequeType vec4 = {1, 2, 4, 5, 6};
+    DequeType vec4 = { 1, 2, 4, 5, 6 };
     it = vec4.cend();
     EXPECT_EQ(it, vec4.cend());
   }
@@ -175,10 +172,10 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator++()", "Preincrement, ++it");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = dq.begin();
-    size_t i{0};
+    size_t i{ 0 };
     while (it != dq.end())
     {
       // same address
@@ -192,10 +189,10 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator++(int)", "Postincrement, it++");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = dq.begin();
-    size_t i{0};
+    size_t i{ 0 };
     while (it != dq.end())
     {
       // same address
@@ -209,10 +206,10 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator--()", "Predecrement, --it");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = std::prev(dq.end());
-    size_t i{dq.size()};
+    size_t i{ dq.size() };
     while (it != dq.begin())
     {
       // std::cout << it << " == " << &dq[i] << "\n";
@@ -227,10 +224,10 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator--(int)", "Postdecrement, it--");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = std::prev(dq.end());
-    size_t i{dq.size()};
+    size_t i{ dq.size() };
     while (it != dq.begin())
     {
       // std::cout << it << " == " << &dq[i] << "\n";
@@ -245,10 +242,10 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator*()", " x = *it1");
 
-    DequeType dq{1, 2, 3, 4, 5, 6};
+    DequeType dq{ 1, 2, 3, 4, 5, 6 };
 
     auto it = dq.begin();
-    int i{1};
+    int i{ 1 };
     while (it != dq.end())
       EXPECT_EQ(*it++, i++);
   }
@@ -258,11 +255,11 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator-()", "it1 - it2");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it1 = dq.begin();
     auto it2 = dq.begin();
-    ptrdiff_t i{0};
+    ptrdiff_t i{ 0 };
     while (it1 != dq.end())
     {
       // same address
@@ -277,10 +274,10 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator+(int, iterator)", "it = 2 + it");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = dq.begin();
-    for (size_t i{0}; i < dq.size(); ++i)
+    for (size_t i{ 0 }; i < dq.size(); ++i)
     {
       // same address
       EXPECT_EQ(*(i + it), dq[i]);
@@ -293,10 +290,10 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator+(iterator, int)", "it = it + 2");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = dq.begin();
-    for (size_t i{0}; i < dq.size(); ++i)
+    for (size_t i{ 0 }; i < dq.size(); ++i)
     {
       // same address
       EXPECT_EQ(*(it + i), dq[i]);
@@ -309,10 +306,10 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator-(iterator, int)", "it = it - 2");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = dq.end() - 1;
-    for (size_t i{0}; i < dq.size(); ++i)
+    for (size_t i{ 0 }; i < dq.size(); ++i)
     {
       // same address
       EXPECT_EQ(*(it - i), dq[dq.size() - i - 1]);
@@ -324,9 +321,9 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator+=()", "it += n");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
-    for (size_t i{0}; i < dq.size(); ++i)
+    for (size_t i{ 0 }; i < dq.size(); ++i)
     {
       auto it = dq.begin();
       it += i;
@@ -340,9 +337,9 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator-=()", "it -= n");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
-    for (size_t i{0}; i < dq.size(); ++i)
+    for (size_t i{ 0 }; i < dq.size(); ++i)
     {
       auto it = dq.end();
       it -= (dq.size() - i);
@@ -356,7 +353,7 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator<()", "it1 < it2");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it1 = dq.begin();
     auto it2 = dq.end();
@@ -372,7 +369,7 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator>()", "it1 > it2");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it1 = dq.begin();
     auto it2 = dq.end();
@@ -388,7 +385,7 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator<=()", "it1 <= it2");
 
-    DequeType dq{1, 2, 3, 4, 5, 6};
+    DequeType dq{ 1, 2, 3, 4, 5, 6 };
 
     auto it1 = dq.begin();
     auto it2 = dq.end();
@@ -404,7 +401,7 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator>=()", "it1 >= it2");
 
-    DequeType dq{1, 2, 3, 4, 5, 6};
+    DequeType dq{ 1, 2, 3, 4, 5, 6 };
 
     auto it1 = dq.begin();
     auto it2 = dq.end();
@@ -420,7 +417,7 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator==()", "it1 == it2");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it1 = dq.begin();
     auto it2 = dq.begin();
@@ -433,7 +430,7 @@ void run_iterator_tests()
   {
     BEGIN_TEST(tm, "operator!=()", "it1 != it2");
 
-    DequeType dq{1, 2, 4, 5, 6};
+    DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it1 = dq.begin();
     auto it2 = dq.end();

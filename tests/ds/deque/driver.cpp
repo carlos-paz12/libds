@@ -1,6 +1,5 @@
-#include <array>
+#include "ds/deque.hpp"
 #include <cstdlib>
-#include <deque>
 #include <iostream>
 
 #include "iterator_tests.hpp"
@@ -12,7 +11,8 @@
 // ============================================================================
 // TESTING deque AS A CONTAINER OF INTEGERS
 // ============================================================================
-int main()
+int
+main()
 {
   // Original values for later conference.
   // constexpr std::array<int, 5> values_i{1, 2, 3, 4, 5};
