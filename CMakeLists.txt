@@ -28,3 +28,15 @@ add_subdirectory(lib/tm)
 
 set(TEST_DRIVER test_driver)
 add_subdirectory(tests)
+
+file(GLOB_RECURSE EXAMPLES "src/ds/*/*.cpp")
+
+foreach(example_file ${EXAMPLES})
+    # Nome do executável baseado no nome da subpasta
+    get_filename_component(example_dir ${example_file} DIRECTORY)
+    get_filename_component(struct_name ${example_dir} NAME)
+    set(exec_name "${struct_name}_example")
+
+    add_executable(${exec_name} ${example_file})
+    target_link_libraries(${exec_name} PRIVATE ds test_manager)
+endforeach()
