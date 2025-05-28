@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 202k
  *
  */
-#include "ds/deque.hpp"
+#include "../../../include/ds/deque.hpp"
 #include <iostream>
 
 void test_Constructs() {
@@ -183,6 +183,7 @@ void test_Iterators() {
 }
 void test_methods() {
   std::cout << "===============Methods========================\n\n";
+   std::cout << " Ciriando deque: ds::Deque<int> d(9, 100); \n";
   ds::Deque<int> d(9, 100);        // Cria deque com 9 elementos iguais a 100
   std::cout << d.to_string_full(); // delhalhe do deque
   std::cout << "\n";
@@ -198,9 +199,28 @@ void test_methods() {
   std::cout << d.size() << "\n"; // Deve imprimir: 9
   std::cout << "\n";
 
+  std::cout << "Testando o método capacity()\n";
+  std::cout << d.capacity() << "\n"; // Deve imprimir: 12
+  std::cout << "\n";
+
   std::cout << "Testando operador[]:\n";
-  for (auto i = d.begin(); i != d.end(); ++i) {
-    std::cout << i.to_string() << "-> value: " << *i << "\n";
+  for (int i{0}; i < d.size(); i++){
+    auto it{d.begin()};
+    std::cout <<it.to_string()<<"value -> " << d[i]<< "\n";
+    ++it;
+  }
+  std::cout << "\n";
+
+  std::cout <<"Mundando o valor de d:\n";
+   d = {1,2,3,4,5,6,7,8,9};
+  std::cout << d.to_string_full(); // delhalhe do deque
+  std::cout << "\n";
+
+  std::cout << "Testando operador at()\n";
+  for (int i{0}; i < d.size(); i++){
+    auto it{d.begin()};
+    std::cout <<it.to_string()<<"value -> " << d.at(i)<< "\n";
+    ++it;
   }
   std::cout << "\n";
 
@@ -214,9 +234,9 @@ void test_methods() {
   std::cout << "\n";
 }
 int main() {
-  std::cout << "================DEQUE OF TESTS==================\n\n";
+  std::cout << "================DEQUE OF TESTS================\n\n";
   // test_Iterators();
-  test_Constructs();
+  //test_Constructs();
   test_methods();
   return 0;
 }
