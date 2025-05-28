@@ -500,10 +500,7 @@ public:
   /*! No bounds checking is performed.
    */
   reference operator[](size_type idx) {
-    // [0] Check if the index is within bounds.
-    if (idx >= m_count) {
-      throw std::out_of_range("Deque::operator[]: index out of range");
-    }
+  
     // [1] Calculate the block and position inside the block.
     size_type block_index{ idx / BlockSize };
     size_type pos_in_block{ idx % BlockSize };
@@ -514,10 +511,6 @@ public:
   /*! No bounds checking is performed.
    */
   const_reference operator[](size_type idx) const {
-    // [0] Check if the index is within bounds.
-    if (idx >= m_count) {
-      throw std::out_of_range("Deque::operator[]: index out of range");
-    }
     // [1] Calculate the block and position inside the block.
     size_type block_index{ idx / BlockSize };
     size_type pos_in_block{ idx % BlockSize };
@@ -528,13 +521,31 @@ public:
   /*! This method checks the bounds and may throw std::out_of_range,
    * in case the idx is outside the Deque's limits.
    */
-  reference at(size_type idx) { }
+  reference at(size_type idx) { 
+     // [0] Check if the index is within bounds.
+    if (idx >= m_count) {
+      throw std::out_of_range("Deque::operator[]: index out of range");
+    }
+    // [1] Calculate the block and position inside the block.
+    size_type block_index{ idx / BlockSize };
+    size_type pos_in_block{ idx % BlockSize };
+    return (*(*m_mob)[block_index])[pos_in_block];
+  }
 
   /// Returns a const ref. to the element at specified location pos.
   /*! This method checks the bounds and may throw std::out_of_range,
    * in case the idx is outside the Deque's limits.
    */
-  const_reference at(size_type idx) const { }
+  const_reference at(size_type idx) const { 
+    // [0] Check if the index is within bounds.
+    if (idx >= m_count) {
+      throw std::out_of_range("Deque::operator[]: index out of range");
+    }
+    // [1] Calculate the block and position inside the block.
+    size_type block_index{ idx / BlockSize };
+    size_type pos_in_block{ idx % BlockSize };
+    return (*(*m_mob)[block_index])[pos_in_block];
+  }
 
   /// Returns the storage capacity of the Deque.
   size_t capacity() { return m_mob->size() * BlockSize; }
