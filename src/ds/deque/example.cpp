@@ -199,9 +199,14 @@ void test_methods() {
   std::cout << d.size() << "\n"; // Deve imprimir: 9
   std::cout << "\n";
 
-  std::cout << "Testando o método capacity()\n";
+  std::cout << "Testando o método capacity():\n";
   std::cout << d.capacity() << "\n"; // Deve imprimir: 12
   std::cout << "\n";
+  //apagar depois 
+  std::cout <<"Testando used_blocks():\n";
+   d.t(); //apagar depois 
+   std::cout <<" blocos que estão 100% ocupados"<< "\n\n";
+   //apagar depois 
 
   std::cout << "Testando operador[]:\n";
   for (int i{0}; i < d.size(); i++){
@@ -212,8 +217,9 @@ void test_methods() {
   std::cout << "\n";
 
   std::cout <<"Mundando o valor de d:\n";
-   d = {1,2,3,4,5,6,7,8,9};
+   d = {1,2,3,4,5,};
   std::cout << d.to_string_full(); // delhalhe do deque
+   
   std::cout << "\n";
 
   std::cout << "Testando operador at()\n";

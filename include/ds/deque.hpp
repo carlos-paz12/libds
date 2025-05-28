@@ -559,7 +559,9 @@ public:
    *
    * Lastly, if current size is equal to count, nothing happens.
    */
-  void resize(size_type count) { }
+  void resize(size_type count) {
+
+   }
 
   /// Deletes unused slots.
   void shrink_to_fit() { }
@@ -650,8 +652,8 @@ private:
     // =================================================================
   }
 
-  /// Returns the number of occupied blocks in the m.o.b.
-  size_type used_blocks() { return 0; }
+  /// Returns the number of occupied 100% blocks in the m.o.b.
+  size_type used_blocks() { return  (m_count/ BlockSize); }
 
   /// Returns how many elements exist in the end block of the target `zone`.
   // [[nodiscard]] size_type block_occupancy_of(zone_e zone) const {}
@@ -661,6 +663,8 @@ private:
   void reset() { }
 
 public:
+   void t(){std::cout << this->used_blocks();} //apagar depois
+   
   [[nodiscard]] std::string to_string() const {
     // return to_string_address();
     // return to_string_full();
