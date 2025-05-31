@@ -7,7 +7,7 @@
 #define NO 0
 
 // =============================================================
-// Second batch of tests, focused on the iterator interface
+// First batch of tests, focused on the iterator interface
 // =============================================================
 
 // Test begin() method that should return a iterator to the first element in the
@@ -58,9 +58,7 @@
 #define DIFFERENT YES
 
 template<typename DequeType>
-void
-run_iterator_tests()
-{
+void run_iterator_tests() {
   TestManager tm{ "Iterator testing" };
 
 #if BEGIN
@@ -176,8 +174,7 @@ run_iterator_tests()
 
     auto it = dq.begin();
     size_t i{ 0 };
-    while (it != dq.end())
-    {
+    while (it != dq.end()) {
       // same address
       EXPECT_EQ(*it, dq[i++]);
       ++it;
@@ -193,8 +190,7 @@ run_iterator_tests()
 
     auto it = dq.begin();
     size_t i{ 0 };
-    while (it != dq.end())
-    {
+    while (it != dq.end()) {
       // same address
       EXPECT_EQ(*it, dq[i++]);
       it++;
@@ -210,8 +206,7 @@ run_iterator_tests()
 
     auto it = std::prev(dq.end());
     size_t i{ dq.size() };
-    while (it != dq.begin())
-    {
+    while (it != dq.begin()) {
       // std::cout << it << " == " << &dq[i] << "\n";
       // same address
       EXPECT_EQ(*it, dq[--i]);
@@ -228,8 +223,7 @@ run_iterator_tests()
 
     auto it = std::prev(dq.end());
     size_t i{ dq.size() };
-    while (it != dq.begin())
-    {
+    while (it != dq.begin()) {
       // std::cout << it << " == " << &dq[i] << "\n";
       // same address
       EXPECT_EQ(*it, dq[--i]);
@@ -246,8 +240,7 @@ run_iterator_tests()
 
     auto it = dq.begin();
     int i{ 1 };
-    while (it != dq.end())
-      EXPECT_EQ(*it++, i++);
+    while (it != dq.end()) EXPECT_EQ(*it++, i++);
   }
 #endif
 
@@ -260,8 +253,7 @@ run_iterator_tests()
     auto it1 = dq.begin();
     auto it2 = dq.begin();
     ptrdiff_t i{ 0 };
-    while (it1 != dq.end())
-    {
+    while (it1 != dq.end()) {
       // same address
       EXPECT_EQ(it1 - it2, i);
       i++;
@@ -277,8 +269,7 @@ run_iterator_tests()
     DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = dq.begin();
-    for (size_t i{ 0 }; i < dq.size(); ++i)
-    {
+    for (size_t i{ 0 }; i < dq.size(); ++i) {
       // same address
       EXPECT_EQ(*(i + it), dq[i]);
       // std::cout << (i+it) << " == " << &dq[i] << "\n";
@@ -293,8 +284,7 @@ run_iterator_tests()
     DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = dq.begin();
-    for (size_t i{ 0 }; i < dq.size(); ++i)
-    {
+    for (size_t i{ 0 }; i < dq.size(); ++i) {
       // same address
       EXPECT_EQ(*(it + i), dq[i]);
       // std::cout << (i+it) << " == " << &dq[i] << "\n";
@@ -309,8 +299,7 @@ run_iterator_tests()
     DequeType dq{ 1, 2, 4, 5, 6 };
 
     auto it = dq.end() - 1;
-    for (size_t i{ 0 }; i < dq.size(); ++i)
-    {
+    for (size_t i{ 0 }; i < dq.size(); ++i) {
       // same address
       EXPECT_EQ(*(it - i), dq[dq.size() - i - 1]);
     }
@@ -323,8 +312,7 @@ run_iterator_tests()
 
     DequeType dq{ 1, 2, 4, 5, 6 };
 
-    for (size_t i{ 0 }; i < dq.size(); ++i)
-    {
+    for (size_t i{ 0 }; i < dq.size(); ++i) {
       auto it = dq.begin();
       it += i;
       // same address
@@ -339,8 +327,7 @@ run_iterator_tests()
 
     DequeType dq{ 1, 2, 4, 5, 6 };
 
-    for (size_t i{ 0 }; i < dq.size(); ++i)
-    {
+    for (size_t i{ 0 }; i < dq.size(); ++i) {
       auto it = dq.end();
       it -= (dq.size() - i);
       // same address
@@ -357,8 +344,7 @@ run_iterator_tests()
 
     auto it1 = dq.begin();
     auto it2 = dq.end();
-    while (it1 != dq.end())
-    {
+    while (it1 != dq.end()) {
       EXPECT_TRUE(it1 < it2);
       ++it1;
     }
@@ -373,8 +359,7 @@ run_iterator_tests()
 
     auto it1 = dq.begin();
     auto it2 = dq.end();
-    while (it1 != dq.end())
-    {
+    while (it1 != dq.end()) {
       EXPECT_TRUE(it2 > it1);
       ++it1;
     }
@@ -389,8 +374,7 @@ run_iterator_tests()
 
     auto it1 = dq.begin();
     auto it2 = dq.end();
-    while (it1 != dq.end())
-    {
+    while (it1 != dq.end()) {
       EXPECT_TRUE(it1 <= it2);
       ++it1;
     }
@@ -405,8 +389,7 @@ run_iterator_tests()
 
     auto it1 = dq.begin();
     auto it2 = dq.end();
-    while (it1 != dq.end())
-    {
+    while (it1 != dq.end()) {
       EXPECT_TRUE(it2 >= it1);
       ++it1;
     }
@@ -421,8 +404,7 @@ run_iterator_tests()
 
     auto it1 = dq.begin();
     auto it2 = dq.begin();
-    while (it1 != dq.end())
-      EXPECT_EQ(it1++, it2++);
+    while (it1 != dq.end()) EXPECT_EQ(it1++, it2++);
   }
 #endif
 
@@ -434,8 +416,7 @@ run_iterator_tests()
 
     auto it1 = dq.begin();
     auto it2 = dq.end();
-    while (it1 != it2)
-    {
+    while (it1 != it2) {
       EXPECT_TRUE(it1 != it2);
       ++it1;
     }

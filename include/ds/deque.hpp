@@ -429,8 +429,8 @@ public:
       // Recalcula a distância entre m_mob->begin() e os iteradores do other
       auto front_blk_index{ other.m_front_itr.m_block - other.m_mob->begin() }; // faz o calculo da distância entre o
                                                                                 // bloco inicial e o bloco atual
-      auto back_blk_index{ other.m_back_itr.m_block - other.m_mob->begin() }; // faz o calculo da distância entre o
-                                                                              // bloco inicial e o bloco atual
+      auto back_blk_index{ other.m_back_itr.m_block - other.m_mob->begin() };   // faz o calculo da distância entre o
+                                                                                // bloco inicial e o bloco atual
       // Recalcula a posição dentro do bloco
       auto front_pos{ other.m_front_itr.m_current -
                       (*other.m_front_itr.m_block)->begin() }; // valor da posição dentro do bloco
@@ -500,7 +500,7 @@ public:
   /*! No bounds checking is performed.
    */
   reference operator[](size_type idx) {
-  
+
     // [1] Calculate the block and position inside the block.
     size_type block_index{ idx / BlockSize };
     size_type pos_in_block{ idx % BlockSize };
@@ -521,8 +521,8 @@ public:
   /*! This method checks the bounds and may throw std::out_of_range,
    * in case the idx is outside the Deque's limits.
    */
-  reference at(size_type idx) { 
-     // [0] Check if the index is within bounds.
+  reference at(size_type idx) {
+    // [0] Check if the index is within bounds.
     if (idx >= m_count) {
       throw std::out_of_range("Deque::operator[]: index out of range");
     }
@@ -536,7 +536,7 @@ public:
   /*! This method checks the bounds and may throw std::out_of_range,
    * in case the idx is outside the Deque's limits.
    */
-  const_reference at(size_type idx) const { 
+  const_reference at(size_type idx) const {
     // [0] Check if the index is within bounds.
     if (idx >= m_count) {
       throw std::out_of_range("Deque::operator[]: index out of range");
@@ -559,9 +559,7 @@ public:
    *
    * Lastly, if current size is equal to count, nothing happens.
    */
-  void resize(size_type count) {
-
-   }
+  void resize(size_type count) { }
 
   /// Deletes unused slots.
   void shrink_to_fit() { }
@@ -653,7 +651,7 @@ private:
   }
 
   /// Returns the number of occupied 100% blocks in the m.o.b.
-  size_type used_blocks() { return  (m_count/ BlockSize); }
+  size_type used_blocks() { return (m_count / BlockSize); }
 
   /// Returns how many elements exist in the end block of the target `zone`.
   // [[nodiscard]] size_type block_occupancy_of(zone_e zone) const {}
@@ -663,8 +661,8 @@ private:
   void reset() { }
 
 public:
-   void t(){std::cout << this->used_blocks();} //apagar depois
-   
+  void t() { std::cout << this->used_blocks(); } // apagar depois
+
   [[nodiscard]] std::string to_string() const {
     // return to_string_address();
     // return to_string_full();

@@ -7,7 +7,7 @@ function(add_data_structure_tests data_structure)
 
     set_target_properties(${TEST_EXECUTABLE} PROPERTIES
         CXX_STANDARD 17
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
     )
 
     target_include_directories(${TEST_EXECUTABLE} PRIVATE
