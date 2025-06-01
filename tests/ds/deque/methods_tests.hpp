@@ -16,7 +16,7 @@
 #define RANGE_CTRO YES
 #define COPY_CTRO YES
 #define INIT_LIST_CTRO YES
-#define ASSIGNMENT_COPY_OP NO
+#define ASSIGNMENT_COPY_OP YES
 
 template<typename T, std::size_t size>
 void run_regular_deque_tests(const std::array<T, size>& values, const std::array<T, size>& source) {
@@ -101,15 +101,16 @@ void run_regular_deque_tests(const std::array<T, size>& values, const std::array
 
 #if ASSIGNMENT_COPY_OP
   {
-    BEGIN_TEST(tm, "copy assignment", "dq2 = dq1;");
+    BEGIN_TEST(tm, "Copy assignment", "dq2 = dq1;");
 
-    DequeType dq1{ 10, 20, 30 };
-    DequeType dq2;
+    ds::Deque<T> dq1{ source[0], source[1], source[2], source[3], source[4] };
+    ds::Deque<T> dq2;
 
     dq2 = dq1;
 
     EXPECT_EQ(dq2.size(), dq1.size());
-    EXPECT_EQ(dq2[1], dq1[1]);
+    EXPECT_EQ(dq2.capacity(), dq1.capacity());
+    EXPECT_FALSE(dq2.empty());
 
     dq2[1] = 100;
 
