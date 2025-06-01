@@ -1,5 +1,5 @@
-#ifndef _DEQUE_HPP_
-#define _DEQUE_HPP_
+#ifndef DEQUE_HPP
+#define DEQUE_HPP
 
 #include <algorithm>        // std::copy, std::equal, std::fill
 #include <array>            // std::array
@@ -218,6 +218,7 @@ template<typename T, std::size_t BlockSize, std::size_t DefaultBlkMapSize>
 class Deque
 {
 public:
+  //================================================== MEMBER TYPES
   //== Typical container aliases
   using size_type = unsigned long;           //!< The size type.
   using value_type = T;                      //!< The value type.
@@ -240,17 +241,19 @@ public:
     Iterator<const T, BlockSize, typename block_list_t::const_iterator, typename block_t::const_iterator>;
 
 private:
-  //== Management variables.
+  //================================================== MEMBER VARIABLES
   std::unique_ptr<block_list_t> m_mob; //!< The dynamic map of blocks.
   iterator m_front_itr;                //!< Iterator to the front block.
   iterator m_back_itr;                 //!< Iterator to the back block.
   size_t m_count{ 0 };                 //!< # of elements stored in the map.
 
 public:
-  /// Dtro.
-  ~Deque() = default;
+  //================================================== MEMBER FUNCTIONS
+  /**
+   * @brief Default constructor.
 
-  /// Default Ctro.
+   * Constructs an empty Deque.
+   */
   Deque() {
     // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
     size_type map_size{ DefaultBlkMapSize };
@@ -272,10 +275,13 @@ public:
     m_back_itr = iterator(m_mob->begin() + end_block, (*m_mob)[end_block]->begin());
   }
 
-  /*! Construct a Deque and initialize it with `n` copies of `value` of type
-   * `T`. If `value` is not provided, a default constructor `T()` is used.
+  /**
+   * @brief Fill constructor.
+   *
+   * Constructs a Deque and initialize it with `n` copies of `value` of type `value_type`.
+   * If `value` is not provided, a default constructor `value_type()` is used.
    */
-  explicit Deque(size_type n, const_reference value = T()) {
+  explicit Deque(size_type n, const_reference value = value_type()) {
     // Número de blocos necessários para armazenar n elementos
     size_type blocks_needed{ static_cast<size_type>(std::ceil((n + BlockSize - 1) / BlockSize)) };
 
@@ -306,8 +312,11 @@ public:
     m_count = n;
   }
 
-  /// Ctro. from a range.
-  // template <class InputIt>
+  /**
+   * @brief Range consatructor.
+   *
+   * Constructs a container with as many elements as the range [first,last), in the same order.
+   */
   template<typename InputIt, typename = typename std::iterator_traits<InputIt>::iterator_category>
   Deque(InputIt first, InputIt last) {
     size_type n = static_cast<size_type>(std::distance(first, last)); // Número de elementos no intervalo
@@ -344,7 +353,11 @@ public:
     m_count = c; // Atualiza a contagem
   }
 
-  /// Copy Ctro.
+  /**
+   * @brief Copy constructor.
+   *
+   * Constructs a container with a copy of each of the elements in `other`.
+   */
   Deque(const Deque& other) {
     size_type mob_size{ other.m_mob->size() }; // Número de blocos alocados
     m_mob = std::make_unique<block_list_t>(mob_size);
@@ -377,7 +390,11 @@ public:
     m_count = other.m_count;                                             // Atualiza a contagem
   }
 
-  /// Initializer list Ctro.
+  /**
+   * @brief Initializer list constructor.
+   *
+   * Constructs a container initialized with the elements in the initializer list `il`, in the same order.
+   */
   Deque(const std::initializer_list<T>& il) {
     size_type n{ static_cast<size_type>(il.size()) }; // Número de elementos no intervalo
 
@@ -413,6 +430,18 @@ public:
     m_count = c;
   }
 
+  /**
+   * @brief Destructor.
+   *
+   * Destroys all container elements, and deallocates all the storage allocated by the Deque.
+   */
+  ~Deque() = default;
+
+  /**
+   * @brief Assign operator.
+   *
+   * Copies all the elements from `other` into the container.
+   */
   Deque& operator=(const Deque& other) {
     if (this != &other) {
       size_type mob_size{ other.m_mob->size() }; // Número de blocos alocados
@@ -448,54 +477,44 @@ public:
     return *this;
   }
 
-  /// Return the number of elements in the Deque.
-  [[nodiscard]] size_type size() const { return m_count; }
-
-  /// Return `true` if the Deque has no elements, `false` otherwise.
-  [[nodiscard]] bool empty() const { return m_count == 0; }
-
+  //================================================== ITERATORS:
   /// Return an iterator to the Deque's first element.
   iterator begin() { return iterator(m_front_itr); }
 
   /// Return an iterator to a location following the Deque's last element.
   iterator end() { return iterator(m_back_itr); }
+
   /// Return a const iterator to the Deque's first element.
   const_iterator cbegin() const { return const_iterator(m_front_itr.m_block, m_front_itr.m_current); }
 
   /// Return a const iterator to a location following the Deque's last element.
   const_iterator cend() const { return const_iterator(m_back_itr.m_block, m_back_itr.m_current); }
 
-  /// Remove all elements from the Deque.
-  void clear() {
-    // Limpa todos os blocos
-    for (auto& block : *m_mob) {
-      block->fill(T()); // Preenche o bloco com valores padrão
-    }
-    m_count = 0; // Zera a contagem
-    m_front_itr = iterator(m_mob->begin(), (*m_mob)[0]->begin());
-    m_back_itr = iterator(m_mob->begin(), (*m_mob)[0]->begin());
-  }
+  //================================================== CAPACITY:
+  /// Return the number of elements in the Deque.
+  [[nodiscard]] size_type size() const { return m_count; }
 
-  /// Insert `value` at the beginning of the Deque.
-  void push_front(const_reference value) { insert(cbegin(), value); }
+  /// Change the number of elements stored in the container.
+  /*!
+   * If the current size ( size() ) is greater than `count` , the container is
+   * reduced to the first count element. On the other hand, if the current size
+   * is less than count , then additional default-inserted elements are appended
+   * to the container.
+   *
+   * Lastly, if current size is equal to count, nothing happens.
+   */
+  void resize(size_type count) { }
 
-  /// Insert `value` at the end of the Deque.
-  void push_back(const_reference value) { insert(cend(), value); }
+  /// Returns the storage capacity of the Deque.
+  size_t capacity() { return m_mob->size() * BlockSize; }
 
-  /// Remove the first element of the Deque.
-  void pop_front() { }
+  /// Return `true` if the Deque has no elements, `false` otherwise.
+  [[nodiscard]] bool empty() const { return m_count == 0; }
 
-  /// Remove the last element of the Deque.
-  void pop_back() { }
+  /// Deletes unused slots.
+  void shrink_to_fit() { }
 
-  reference front() { return *begin(); }
-  const_reference front() const { return *cbegin(); }
-  reference back() { return *(--end()); }
-  const_reference back() const { return *(--cend()); }
-
-  /// Replaces the content of the Deque with 'count' copies f 'value'.
-  void assign(size_type count, const T& value) { }
-
+  //================================================== ELEMENT ACCESS:
   /// Returns a reference to the element at specified location `pos`.
   /*! No bounds checking is performed.
    */
@@ -547,22 +566,37 @@ public:
     return (*(*m_mob)[block_index])[pos_in_block];
   }
 
-  /// Returns the storage capacity of the Deque.
-  size_t capacity() { return m_mob->size() * BlockSize; }
+  reference front() { return *begin(); }
 
-  /// Change the number of elements stored in the container.
-  /*!
-   * If the current size ( size() ) is greater than `count` , the container is
-   * reduced to the first count element. On the other hand, if the current size
-   * is less than count , then additional default-inserted elements are appended
-   * to the container.
-   *
-   * Lastly, if current size is equal to count, nothing happens.
-   */
-  void resize(size_type count) { }
+  const_reference front() const { return *cbegin(); }
 
-  /// Deletes unused slots.
-  void shrink_to_fit() { }
+  reference back() { return *(--end()); }
+
+  const_reference back() const { return *(--cend()); }
+
+  //================================================== MODIFIERS:
+  /// Replaces the content of the Deque with 'count' copies f 'value'.
+  void assign(size_type count, const T& value) { }
+
+  /// Replaces the content of the Deque with the values from [first,last).
+  template<typename InputIt>
+  void assign(InputIt first, InputIt last) { }
+
+  /// Replaces the content of the Deque with the values from the
+  /// initializer_list.
+  void assign(const std::initializer_list<T>& il) { }
+
+  /// Insert `value` at the beginning of the Deque.
+  void push_front(const_reference value) { insert(cbegin(), value); }
+
+  /// Insert `value` at the end of the Deque.
+  void push_back(const_reference value) { insert(cend(), value); }
+
+  /// Remove the first element of the Deque.
+  void pop_front() { }
+
+  /// Remove the last element of the Deque.
+  void pop_back() { }
 
   /// Inserts `value` before `cpos`.
   iterator insert(const_iterator cpos, const T& value) { }
@@ -585,16 +619,20 @@ public:
 
   /// Removes the element at `pos`.
   iterator erase(const_iterator cpos) { }
+
   /// Removes the element at `pos`.
   iterator erase(iterator pos) { }
 
-  /// Replaces the content of the Deque with the values from [first,last).
-  template<typename InputIt>
-  void assign(InputIt first, InputIt last) { }
-
-  /// Replaces the content of the Deque with the values from the
-  /// initializer_list.
-  void assign(const std::initializer_list<T>& il) { }
+  /// Remove all elements from the Deque.
+  void clear() {
+    // Limpa todos os blocos
+    for (auto& block : *m_mob) {
+      block->fill(T()); // Preenche o bloco com valores padrão
+    }
+    m_count = 0; // Zera a contagem
+    m_front_itr = iterator(m_mob->begin(), (*m_mob)[0]->begin());
+    m_back_itr = iterator(m_mob->begin(), (*m_mob)[0]->begin());
+  }
 
 private:
   /// Returns how many unused slots of the MOB we have at the target zone.
@@ -661,8 +699,6 @@ private:
   void reset() { }
 
 public:
-  void t() { std::cout << this->used_blocks(); } // apagar depois
-
   [[nodiscard]] std::string to_string() const {
     // return to_string_address();
     // return to_string_full();
@@ -772,4 +808,4 @@ bool operator!=(const Deque<T>& lhs, const Deque<T>& rhs) {
 }
 } // namespace ds
 
-#endif //!< _DEQUE_HPP_
+#endif // DEQUE_HPP
