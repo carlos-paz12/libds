@@ -183,7 +183,7 @@ void test_Iterators() {
 }
 void test_methods() {
   std::cout << "===============Methods========================\n\n";
-   std::cout << " Ciriando deque: ds::Deque<int> d(9, 100); \n";
+  std::cout << " Ciriando deque: ds::Deque<int> d(9, 100); \n";
   ds::Deque<int> d(9, 100);        // Cria deque com 9 elementos iguais a 100
   std::cout << d.to_string_full(); // delhalhe do deque
   std::cout << "\n";
@@ -202,30 +202,32 @@ void test_methods() {
   std::cout << "Testando o método capacity():\n";
   std::cout << d.capacity() << "\n"; // Deve imprimir: 12
   std::cout << "\n";
-  //apagar depois 
-  std::cout <<"Testando used_blocks():\n";
-   d.t(); //apagar depois 
-   std::cout <<" blocos que estão 100% ocupados"<< "\n\n";
-   //apagar depois 
+  // apagar depois
+  std::cout << "Testando used_blocks():\n";
+  std::cout << " blocos que estão 100% ocupados"
+            << "\n\n";
+  // apagar depois
 
   std::cout << "Testando operador[]:\n";
-  for (int i{0}; i < d.size(); i++){
-    auto it{d.begin()};
-    std::cout <<it.to_string()<<"value -> " << d[i]<< "\n";
+  for (int i{ 0 }; i < d.size(); i++) {
+    auto it{ d.begin() };
+    std::cout << it.to_string() << "value -> " << d[i] << "\n";
     ++it;
   }
   std::cout << "\n";
 
-  std::cout <<"Mundando o valor de d:\n";
-   d = {1,2,3,4,5,};
+  std::cout << "Mundando o valor de d:\n";
+  d = {
+    1, 2, 3, 4, 5,
+  };
   std::cout << d.to_string_full(); // delhalhe do deque
-   
+
   std::cout << "\n";
 
   std::cout << "Testando operador at()\n";
-  for (int i{0}; i < d.size(); i++){
-    auto it{d.begin()};
-    std::cout <<it.to_string()<<"value -> " << d.at(i)<< "\n";
+  for (int i{ 0 }; i < d.size(); i++) {
+    auto it{ d.begin() };
+    std::cout << it.to_string() << "value -> " << d.at(i) << "\n";
     ++it;
   }
   std::cout << "\n";
@@ -242,7 +244,7 @@ void test_methods() {
 int main() {
   std::cout << "================DEQUE OF TESTS================\n\n";
   // test_Iterators();
-  //test_Constructs();
+  // test_Constructs();
   test_methods();
   return 0;
 }

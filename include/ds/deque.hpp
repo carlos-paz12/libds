@@ -220,7 +220,7 @@ class Deque
 public:
   //================================================== MEMBER TYPES
   //== Typical container aliases
-  using size_type = unsigned long;           //!< The size type.
+  using size_type = std::size_t;             //!< The size type.
   using value_type = T;                      //!< The value type.
   using pointer = value_type*;               //!< Pointer to a value stored in the container.
   using reference = value_type&;             //!< Reference to a value.
@@ -237,8 +237,7 @@ public:
   /// Regular iterator.
   using iterator = Iterator<T, BlockSize, typename block_list_t::iterator, typename block_t::iterator>;
   /// Const iterator.
-  using const_iterator =
-    Iterator<const T, BlockSize, typename block_list_t::const_iterator, typename block_t::const_iterator>;
+  using const_iterator = Iterator<const T, BlockSize, typename block_list_t::const_iterator, typename block_t::const_iterator>;
 
 private:
   //================================================== MEMBER VARIABLES
@@ -365,21 +364,18 @@ public:
     // Aloca e copia os blocos
     for (size_type i = 0; i < mob_size; ++i) {
       (*m_mob)[i] = std::make_shared<block_t>();
-      std::copy((*other.m_mob)[i]->begin(),
-                (*other.m_mob)[i]->end(),
+      std::copy((*other.m_mob)[i]->begin(), (*other.m_mob)[i]->end(),
                 (*m_mob)[i]->begin()); // Copia os elementos do bloco
     }
 
     // Recalcula a distância entre m_mob->begin() e os iteradores do other
     auto front_blk_index{ other.m_front_itr.m_block - other.m_mob->begin() }; // faz o calculo da distância entre o
                                                                               // bloco inicial e o bloco atual
-    auto back_blk_index{ other.m_back_itr.m_block - other.m_mob->begin() }; // faz o calculo da distância entre o bloco
-                                                                            // inicial e o bloco atual
+    auto back_blk_index{ other.m_back_itr.m_block - other.m_mob->begin() };   // faz o calculo da distância entre o bloco
+                                                                              // inicial e o bloco atual
     // Recalcula a posição dentro do bloco
-    auto front_pos{ other.m_front_itr.m_current -
-                    (*other.m_front_itr.m_block)->begin() }; // valor da posição dentro do bloco
-    auto back_pos{ other.m_back_itr.m_current -
-                   (*other.m_back_itr.m_block)->begin() }; // valor da posição dentro do bloco
+    auto front_pos{ other.m_front_itr.m_current - (*other.m_front_itr.m_block)->begin() }; // valor da posição dentro do bloco
+    auto back_pos{ other.m_back_itr.m_current - (*other.m_back_itr.m_block)->begin() };    // valor da posição dentro do bloco
 
     // Cria novos iteradores com base nos blocos da nova m_mob
     m_front_itr = iterator(m_mob->begin() + front_blk_index,
@@ -450,8 +446,7 @@ public:
       // Aloca e copia os blocos
       for (size_type i = 0; i < mob_size; ++i) {
         (*m_mob)[i] = std::make_shared<block_t>();
-        std::copy((*other.m_mob)[i]->begin(),
-                  (*other.m_mob)[i]->end(),
+        std::copy((*other.m_mob)[i]->begin(), (*other.m_mob)[i]->end(),
                   (*m_mob)[i]->begin()); // Copia os elementos do bloco
       }
 
@@ -461,10 +456,8 @@ public:
       auto back_blk_index{ other.m_back_itr.m_block - other.m_mob->begin() };   // faz o calculo da distância entre o
                                                                                 // bloco inicial e o bloco atual
       // Recalcula a posição dentro do bloco
-      auto front_pos{ other.m_front_itr.m_current -
-                      (*other.m_front_itr.m_block)->begin() }; // valor da posição dentro do bloco
-      auto back_pos{ other.m_back_itr.m_current -
-                     (*other.m_back_itr.m_block)->begin() }; // valor da posição dentro do bloco
+      auto front_pos{ other.m_front_itr.m_current - (*other.m_front_itr.m_block)->begin() }; // valor da posição dentro do bloco
+      auto back_pos{ other.m_back_itr.m_current - (*other.m_back_itr.m_block)->begin() };    // valor da posição dentro do bloco
 
       // Cria novos iteradores com base nos blocos da nova m_mob
       m_front_itr = iterator(m_mob->begin() + front_blk_index,
@@ -490,8 +483,12 @@ public:
   /// Return a const iterator to a location following the Deque's last element.
   const_iterator cend() const { return const_iterator(m_back_itr.m_block, m_back_itr.m_current); }
 
-  //================================================== CAPACITY:
-  /// Return the number of elements in the Deque.
+  //================================================== CAPACITY
+  /**
+   * @brief Returns the number of elements currently stored in the Deque.
+   *
+   * @return The number of elements in the Deque.
+   */
   [[nodiscard]] size_type size() const { return m_count; }
 
   /// Change the number of elements stored in the container.
@@ -505,11 +502,22 @@ public:
    */
   void resize(size_type count) { }
 
-  /// Returns the storage capacity of the Deque.
-  size_t capacity() { return m_mob->size() * BlockSize; }
+  /**
+   * @brief Returns the total storage capacity of the Deque.
+   *
+   * The capacity corresponds to the maximum number of elements that the Deque
+   * can currently hold without reallocating memory.
+   *
+   * @return The total capacity of the Deque.
+   */
+  [[nodiscard]] size_type capacity() { return (m_mob->size() * BlockSize); }
 
-  /// Return `true` if the Deque has no elements, `false` otherwise.
-  [[nodiscard]] bool empty() const { return m_count == 0; }
+  /**
+   * @brief Checks whether the Deque is empty.
+   *
+   * @return `true` if the Deque is empty, `false` otherwise.
+   */
+  [[nodiscard]] bool empty() const { return (m_count == 0); }
 
   /// Deletes unused slots.
   void shrink_to_fit() { }
