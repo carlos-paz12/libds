@@ -35,7 +35,8 @@ private:
   BlockItr m_block;  //!< Ponteiro para o bloco atual.
   ItemItr m_current; //!< Ponteiro para o elemento dentro do bloco atual.
 
-  // [!] Nós Precisamos de conceder esta amizade para permitir que o Deque acesso os atributos privados do iterador.
+  // [!] Nós Precisamos de conceder esta amizade para permitir que o Deque
+  // acesso os atributos privados do iterador.
   friend class Deque<T>;
 
 public:
@@ -67,7 +68,8 @@ public:
     {
       // [!] Se chegou...
       m_block++;                       // [!] avança para o próximo bloco e...
-      m_current = (*m_block)->begin(); // [!] posiciona o ponteiro do elemento para o início do novo bloco.
+      m_current = (*m_block)->begin(); // [!] posiciona o ponteiro do elemento
+                                       // para o início do novo bloco.
     }
     return *this;
   }
@@ -171,7 +173,8 @@ public:
    *
    * @param other Iterador à direita.
    *
-   * @return true Se o iterador à esquerda é menor que o iterador à direita, `false` caso contrário.
+   * @return true Se o iterador à esquerda é menor que o iterador à direita,
+   * `false` caso contrário.
    */
   bool operator<(const Iterator& other) const {
     return (m_block < other.m_block) or ((m_block == other.m_block) and (m_current < other.m_current));
@@ -182,25 +185,30 @@ public:
    *
    * @param other Iterador à direita.
    *
-   * @return true Se o iterador à esquerda é maior que o iterador à direita, `false` caso contrário.
+   * @return true Se o iterador à esquerda é maior que o iterador à direita,
+   * `false` caso contrário.
    */
   bool operator>(const Iterator& other) const { return not(*this < other); }
 
   /**
-   * @brief Compara se o iterador à esquerda é menor ou igual que o iterador à direita.
+   * @brief Compara se o iterador à esquerda é menor ou igual que o iterador à
+   * direita.
    *
    * @param other Iterador à direita.
    *
-   * @return true Se o iterador à esquerda é menor ou igual que o iterador à direita, `false` caso contrário.
+   * @return true Se o iterador à esquerda é menor ou igual que o iterador à
+   * direita, `false` caso contrário.
    */
   bool operator<=(const Iterator& other) const { return (*this < other) or (*this == other); }
 
   /**
-   * @brief Compara se o iterador à esquerda é maior ou igual que o iterador à direita.
+   * @brief Compara se o iterador à esquerda é maior ou igual que o iterador à
+   * direita.
    *
    * @param other Iterador à direita.
    *
-   * @return true Se o iterador à esquerda é maior ou igual que o iterador à direita, `false` caso contrário.
+   * @return true Se o iterador à esquerda é maior ou igual que o iterador à
+   * direita, `false` caso contrário.
    */
   bool operator>=(const Iterator& other) const { return not(*this < other); }
 
@@ -277,8 +285,9 @@ public:
   /**
    * @brief Fill constructor.
    *
-   * Constructs a Deque and initialize it with `n` copies of `value` of type `value_type`.
-   * If `value` is not provided, a default constructor `value_type()` is used.
+   * Constructs a Deque and initialize it with `n` copies of `value` of type
+   * `value_type`. If `value` is not provided, a default constructor
+   * `value_type()` is used.
    */
   explicit Deque(size_type n, const_reference value = value_type()) {
     // Número de blocos necessários para armazenar n elementos
@@ -314,7 +323,8 @@ public:
   /**
    * @brief Range consatructor.
    *
-   * Constructs a container with as many elements as the range [first,last), in the same order.
+   * Constructs a container with as many elements as the range [first,last), in
+   * the same order.
    */
   template<typename InputIt, typename = typename std::iterator_traits<InputIt>::iterator_category>
   Deque(InputIt first, InputIt last) {
@@ -389,7 +399,8 @@ public:
   /**
    * @brief Initializer list constructor.
    *
-   * Constructs a container initialized with the elements in the initializer list `il`, in the same order.
+   * Constructs a container initialized with the elements in the initializer
+   * list `il`, in the same order.
    */
   Deque(const std::initializer_list<T>& il) {
     size_type n{ static_cast<size_type>(il.size()) }; // Número de elementos no intervalo
@@ -429,7 +440,8 @@ public:
   /**
    * @brief Destructor.
    *
-   * Destroys all container elements, and deallocates all the storage allocated by the Deque.
+   * Destroys all container elements, and deallocates all the storage allocated
+   * by the Deque.
    */
   ~Deque() = default;
 
@@ -607,7 +619,13 @@ public:
   void pop_back() { }
 
   /// Inserts `value` before `cpos`.
-  iterator insert(const_iterator cpos, const T& value) { }
+  iterator insert(const_iterator cpos, const T& value) {
+    iterator pos(cpos.m_block, cpos.m_current);
+
+    /// @todo
+
+    m_count++;
+  }
 
   /// Inserts `count` copies of `value` before `cpos`.
   iterator insert(const_iterator cpos, size_type count, const T& value) { }
@@ -678,26 +696,83 @@ private:
    *
    * @postcondition The front and back iterators point to the new map of blocks.
    */
-  void expand_mob(size_type extra_slots) {
-    // [0] Conservative MOB growth.
-    auto new_mob_size = used_blocks() + (2 * extra_slots);
-    // [0] Aggressive MOB growth.
-    // auto new_mob_size = 2 * m_mob->size() + extra_slots;
-    // =================================================================
-    // [1] Allocate the new expanded memory for the map.
-    // =================================================================
+  void expand_mob(const size_type& extra_slots) {
+    //!< Total number of blocks currently used (fully + partially).
+    const size_type total_blocks_in_use{ used_blocks() + partially_used_blocks() };
+    //!< Current size (number of blocks) of the MOB.
+    const size_type old_mob_size{ m_mob->size() };
+    //!< Number of completely free blocks in the current MOB.
+    const size_type free_blocks{ old_mob_size - total_blocks_in_use };
+    //!< Initialize new size with the current size.
+    size_type new_size{ old_mob_size };
 
-    // =================================================================
-    // [2] Copy data from old memory to the new one.
-    // =================================================================
+    /*!
+     * Only expand the MOB if the requested extra slots exceed half of the free blocks.
+     * This prevents unnecessary over-allocation.
+     */
+    if (extra_slots > (free_blocks / 2)) {
+      /*!
+       * Multiply by 2 to allocate extra space both at the beginning and end of the MOB,
+       * maintaining balance and avoiding fragmentation.
+       */
+      new_size = total_blocks_in_use + 2 * extra_slots;
+    }
 
-    // =================================================================
-    // [3] Update pointers to the new memory.
-    // =================================================================
+    //!< Create the new MOB vector with `new_size` blocks, all initialized to nullptr.
+    auto new_mob{ std::make_unique<block_list_t>(new_size, nullptr) };
+
+    // [!] References for clarity:
+    //!< Old MOB vector reference.
+    const auto& old_mob_ref{ *m_mob };
+    //!< New MOB vector reference.
+    const auto& new_mob_ref{ *new_mob };
+
+    //!< Offset to center the used blocks inside the new MOB.
+    const size_type offset{ (new_size - total_blocks_in_use) / 2 };
+
+    //!< Indices of the first and last occupied blocks in the old MOB.
+    const size_type old_front_idx{ m_front_itr.m_block - m_mob->begin() };
+    const size_type old_back_idx{ m_back_itr.m_block - m_mob->begin() };
+
+    /*!
+     * Copy all occupied blocks from the old MOB to the new MOB,
+     * starting at the offset to keep them centered.
+     */
+    for (size_type i{ old_front_idx }; i <= old_back_idx; ++i) {
+      new_mob_ref[offset + (i - old_front_idx)] = old_mob_ref[i];
+    }
+
+    //=========================================================================
+    /*!
+     * Relocate the front and back iterators to the new blocks, preserving their
+     * exact position within each block.
+     */
+    //!< New front block iterator.
+    const auto new_front_blk{ new_mob->begin() + offset };
+    //!< New back block iterator.
+    const auto new_back_blk{ new_front_blk + (old_back_idx - old_front_idx) };
+
+    //!< References to the blocks pointed by the new front and back iterators.
+    const auto& new_front_blk_ref{ *new_front_blk };
+    const auto& new_back_blk_ref{ *new_back_blk };
+
+    //!< Offsets within their old blocks.
+    const auto offset_front{ m_front_itr.m_current - old_mob_ref[old_front_idx]->begin() };
+    const auto offset_back{ m_back_itr.m_current - old_mob_ref[old_back_idx]->begin() };
+
+    // [!] Update m_front_itr and m_back_itr to point to the corresponding elements in the new blocks.
+    m_front_itr = iterator(new_front_blk, new_front_blk_ref.begin() + offset_front);
+    m_back_itr = iterator(new_back_blk, new_back_blk_ref.begin() + offset_back);
+
+    // [!] Replace the old MOB with the new, expanded and balanced MOB.
+    m_mob = std::move(new_mob);
   }
 
-  /// Returns the number of occupied 100% blocks in the m.o.b.
+  /// Returns the number of occupied 100% blocks in the MOB.
   size_type used_blocks() { return (m_count / BlockSize); }
+
+  /// Returns the number of blocks partially occupied in the MOB.
+  size_type partially_used_blocks() { return ((m_count % BlockSize) != 0 ? 1 : 0); }
 
   /// Returns how many elements exist in the end block of the target `zone`.
   // [[nodiscard]] size_type block_occupancy_of(zone_e zone) const {}
