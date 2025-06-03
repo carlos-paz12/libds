@@ -243,6 +243,33 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 #endif
 
 #if INSERT
+  {
+    BEGIN_TEST(tmanager, "Insert", "deque.insert(cpos, val);");
+
+    ds::Deque<T> deque;
+
+    deque.insert(deque.begin(), 10);
+    EXPECT_EQ(deque[0], 10);
+    EXPECT_EQ(deque.size(), 1);
+
+    deque.insert(deque.begin(), 20);
+    EXPECT_EQ(deque[0], 20);
+    EXPECT_EQ(deque[1], 10);
+    EXPECT_EQ(deque.size(), 2);
+
+    deque.insert(deque.end(), 30);
+    EXPECT_EQ(deque[0], 20);
+    EXPECT_EQ(deque[1], 10);
+    EXPECT_EQ(deque[2], 30);
+    EXPECT_EQ(deque.size(), 3);
+
+    deque.insert(deque.begin() + 1, 40);
+    EXPECT_EQ(deque[0], 20);
+    EXPECT_EQ(deque[1], 40);
+    EXPECT_EQ(deque[2], 10);
+    EXPECT_EQ(deque[3], 30);
+    EXPECT_EQ(deque.size(), 4);
+  }
 #endif
 
 #if INSERT_FILL
