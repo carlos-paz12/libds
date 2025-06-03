@@ -539,7 +539,6 @@ public:
   /*! No bounds checking is performed.
    */
   reference operator[](size_type idx) {
-
     // [1] Calculate the block and position inside the block.
     size_type block_index{ idx / BlockSize };
     size_type pos_in_block{ idx % BlockSize };
@@ -619,12 +618,40 @@ public:
   void pop_back() { }
 
   /// Inserts `value` before `cpos`.
-  iterator insert(const_iterator cpos, const T& value) {
-    iterator pos(cpos.m_block, cpos.m_current);
+  iterator insert(iterator pos, const T& value) {
+    if (pos == m_front_itr) {
+      if (m_front_itr.m_current == (*m_front_itr.m_block)->begin() && m_front_itr.m_block == m_mob->begin()) {
+        expand_mob(1);
+      }
 
-    /// @todo
+      --m_front_itr;
+      *m_front_itr = value;
+      ++m_count;
+      return m_front_itr;
+    }
 
-    m_count++;
+    if (pos == m_back_itr) {
+      if (m_back_itr.m_current == (*m_back_itr.m_block)->end() && m_back_itr.m_block == m_mob->end() - 1) {
+        expand_mob(1);
+      }
+
+      *m_back_itr = value;
+      ++m_back_itr;
+      ++m_count;
+      return m_back_itr - 1;
+    }
+
+    iterator it = m_back_itr;
+    ++m_back_itr;
+    ++m_count;
+
+    while (it != pos) {
+      *it = *(it - 1);
+      --it;
+    }
+
+    *pos = value;
+    return pos;
   }
 
   /// Inserts `count` copies of `value` before `cpos`.
@@ -723,16 +750,16 @@ private:
 
     // [!] References for clarity:
     //!< Old MOB vector reference.
-    const auto& old_mob_ref{ *m_mob };
+    auto& old_mob_ref{ *m_mob };
     //!< New MOB vector reference.
-    const auto& new_mob_ref{ *new_mob };
+    auto& new_mob_ref{ *new_mob };
 
     //!< Offset to center the used blocks inside the new MOB.
     const size_type offset{ (new_size - total_blocks_in_use) / 2 };
 
     //!< Indices of the first and last occupied blocks in the old MOB.
-    const size_type old_front_idx{ m_front_itr.m_block - m_mob->begin() };
-    const size_type old_back_idx{ m_back_itr.m_block - m_mob->begin() };
+    size_type old_front_idx = static_cast<size_type>(m_front_itr.m_block - m_mob->begin());
+    size_type old_back_idx = static_cast<size_type>(m_back_itr.m_block - m_mob->begin());
 
     /*!
      * Copy all occupied blocks from the old MOB to the new MOB,
@@ -761,8 +788,8 @@ private:
     const auto offset_back{ m_back_itr.m_current - old_mob_ref[old_back_idx]->begin() };
 
     // [!] Update m_front_itr and m_back_itr to point to the corresponding elements in the new blocks.
-    m_front_itr = iterator(new_front_blk, new_front_blk_ref.begin() + offset_front);
-    m_back_itr = iterator(new_back_blk, new_back_blk_ref.begin() + offset_back);
+    m_front_itr = iterator(new_front_blk, new_front_blk_ref->begin() + offset_front);
+    m_back_itr = iterator(new_back_blk, new_back_blk_ref->begin() + offset_back);
 
     // [!] Replace the old MOB with the new, expanded and balanced MOB.
     m_mob = std::move(new_mob);
