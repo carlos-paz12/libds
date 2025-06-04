@@ -550,7 +550,17 @@ public:
    *
    * Lastly, if current size is equal to count, nothing happens.
    */
-  void resize(size_type count) { }
+  void resize(size_type count) {
+    if (m_count < count) {
+      while (m_count < count) {
+        push_back(value_type());
+      }
+    } else if (m_count > count) {
+      while (m_count > count) {
+        pop_back();
+      }
+    }
+  }
 
   /**
    * @brief Returns the total storage capacity of the Deque.
