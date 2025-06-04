@@ -28,30 +28,29 @@
 // [!] Test the assignment of a Deque.
 #define ASSIGN_OP NO
 // [!] Test the size of a Deque.
-#define SIZE NO
+#define SIZE YES
 // [!] Test the resizing of a Deque.
 #define RESIZE NO
 // [!] Test the capacity of a Deque.
-#define CAPACITY NO
+#define CAPACITY YES
 // [!] Test the empty state of a Deque.
-#define EMPTY NO
+#define EMPTY YES
 // [!] Test the reduction of a Deque's capacity.
-#define SHRINK_TO_FIT NO
+#define SHRINK_TO_FIT YES
 // [!] Test the access to the first element of a Deque.
-#define FRONT NO
+#define FRONT YES
 // [!] Test the access to the first element of a const Deque.
-#define FRONT_CONST NO
+#define FRONT_CONST YES
 // [!] Test the access to the last element of a Deque.
-#define BACK NO
+#define BACK YES
 // [!] Test the access to the last element of a const Deque.
-#define BACK_CONST NO
+#define BACK_CONST YES
 // [!] Test the assignment of a Deque using the assign() method.
-#define ASSIGN NO
-// [!] Test the assignment of a Deque from an initializer list using
-#define ASSIGN_INIT_LIST NO
-// assign().
+#define ASSIGN YES
+// [!] Test the assignment of a Deque from an initializer list using assign().
+#define ASSIGN_INIT_LIST YES
 // [!] Test the assignment of a Deque from a range using assign().
-#define ASSIGN_RANGE NO
+#define ASSIGN_RANGE YES
 // [!] Test inserting an element at the front of a Deque.
 #define PUSH_FRONT YES
 // [!] Test inserting an element at the back of a Deque.
@@ -61,24 +60,24 @@
 // [!] Test removing the last element of a Deque.
 #define POP_BACK YES
 // [!] Test inserting an element at a specific position in a Deque.
-#define INSERT NO
+#define INSERT YES
 // [!] Test inserting multiple copies of an element at a position in a
-#define INSERT_FILL NO
+#define INSERT_FILL YES
 // Deque.
 // [!] Test inserting elements from an initializer list into a Deque.
-#define INSERT_INIT_LIST NO
+#define INSERT_INIT_LIST YES
 // [!] Test inserting a range of elements into a Deque.
-#define INSERT_RANGE NO
+#define INSERT_RANGE YES
 // [!] Test erasing an element at a specific position in a Deque.
-#define ERASE NO
+#define ERASE YES
 // [!] Test erasing an element at a specific position in a const Deque.
-#define ERASE_CONST NO
+#define ERASE_CONST YES
 // [!] Test erasing a range of elements from a Deque.
-#define ERASE_RANGE NO
+#define ERASE_RANGE YES
 // [!] Test erasing a range of elements from a const Deque.
-#define ERASE_RANGE_CONST NO
+#define ERASE_RANGE_CONST YES
 // [!] Test clearing all elements from a Deque.
-#define CLEAR NO
+#define CLEAR YES
 
 template<typename T, std::size_t size>
 void run_regular_deque_tests(const std::array<T, size>& src) {
@@ -249,15 +248,67 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 #endif
 
 #if FRONT
+  {
+    BEGIN_TEST(tmanager, "Front", "deque.front();");
+
+    ds::Deque<T, 3, 3> deque;
+
+    for (std::size_t i = 0; i < size; ++i) {
+      deque.push_back(src[i]);
+    }
+
+    EXPECT_EQ(deque.front(), src[0]);
+
+    deque.back() = deque.back() + 100;
+    EXPECT_NE(deque.front(), src[0]);
+  }
 #endif
 
 #if FRONT_CONST
+  {
+    BEGIN_TEST(tmanager, "Front const", "const_deque.front();");
+
+    ds::Deque<T, 3, 3> deque;
+
+    for (std::size_t i = 0; i < size; ++i) {
+      deque.push_back(src[i]);
+    }
+
+    const ds::Deque<T, 3, 3>& const_deque = deque;
+    EXPECT_EQ(const_deque.front(), src[0]);
+  }
 #endif
 
 #if BACK
+  {
+    BEGIN_TEST(tmanager, "Back", "deque.back();");
+
+    ds::Deque<T, 3, 3> deque;
+
+    for (std::size_t i = 0; i < size; ++i) {
+      deque.push_back(src[i]);
+    }
+
+    EXPECT_EQ(deque.back(), src.back());
+
+    deque.back() = deque.back() + 100;
+    EXPECT_NE(deque.back(), src.back());
+  }
 #endif
 
 #if BACK_CONST
+  {
+    BEGIN_TEST(tmanager, "Back const", "const_deque.back();");
+
+    ds::Deque<T, 3, 3> deque;
+
+    for (std::size_t i = 0; i < size; ++i) {
+      deque.push_back(src[i]);
+    }
+
+    const ds::Deque<T, 3, 3>& const_deque = deque;
+    EXPECT_EQ(const_deque.back(), src.back());
+  }
 #endif
 
 #if ASSIGN
@@ -282,7 +333,6 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
     EXPECT_EQ(deque.size(), src.size());
 
-    // Verifica ordem invertida
     for (std::size_t i = 0; i < size; ++i) {
       EXPECT_EQ(deque[i], src[size - i - 1]);
     }
@@ -302,7 +352,6 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
     EXPECT_EQ(deque.size(), src.size());
 
-    // Verifica ordem normal
     for (std::size_t i = 0; i < size; ++i) {
       EXPECT_EQ(deque[i], src[i]);
     }
@@ -326,15 +375,13 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
     EXPECT_NE(deque.front(), first_val);
     EXPECT_EQ(deque.size(), src.size() - 1);
 
-    // Esvazia o deque
     while (!deque.empty()) {
       deque.pop_front();
     }
 
     EXPECT_TRUE(deque.empty());
 
-    // Pop em vazio
-    deque.pop_front(); // Deve ser seguro
+    deque.pop_front();
     EXPECT_TRUE(deque.empty());
   }
 #endif
