@@ -633,7 +633,7 @@ public:
   reference operator[](size_type idx) {
     // [1] Calculate the block and position inside the block.
     // Devemos considerar m_front_itr.m_current como valor do deque[0]
-    iterator block_index{  m_front_itr + idx };
+    iterator block_index{ m_front_itr + idx };
 
     return (*block_index.m_current);
   }
@@ -643,7 +643,7 @@ public:
    */
   const_reference operator[](size_type idx) const {
     // [1] Calculate the block and position inside the block.
-    iterator block_index{  m_front_itr + idx };
+    iterator block_index{ m_front_itr + idx };
 
     return (*block_index.m_current);
   }
@@ -720,30 +720,44 @@ public:
     }
 
     if (pos == m_front_itr) {
-      if (m_front_itr.m_current == (*m_front_itr.m_block)->begin() &&
-          m_front_itr.m_block == m_mob->begin()) {
-        std::cout << "Breakpoint 1\n";
+      bool need_expand =
+        m_front_itr.m_current == (*m_front_itr.m_block)->begin() &&
+        m_front_itr.m_block == m_mob->begin();
+
+      if (need_expand) {
         expand_mob(1);
       }
-      std::cout << "Breakpoint 2\n";
+
+      if (m_front_itr.m_current == (*m_front_itr.m_block)->begin() and
+          *(std::prev(m_front_itr.m_block)) == nullptr) {
+        *(std::prev(m_front_itr.m_block)) = std::make_shared<block_t>();
+      }
+
       --m_front_itr;
-      std::cout << "Breakpoint 3\n";
       *m_front_itr.m_current = value;
-      std::cout << "Breakpoint 4\n";
+
       ++m_count;
-      std::cout << "Breakpoint 5\n";
       return m_front_itr;
     }
 
     if (pos == m_back_itr) {
-      if (m_back_itr.m_current == (*m_back_itr.m_block)->end() &&
+      *m_back_itr.m_current = value;
+
+      if (m_back_itr.m_current == (*m_back_itr.m_block)->end() - 1 &&
           m_back_itr.m_block == m_mob->end() - 1) {
+
         expand_mob(1);
       }
 
-      *m_back_itr = value;
+      if (m_back_itr.m_current == (*m_back_itr.m_block)->end() - 1 and
+          *(m_back_itr.m_block + 1) == nullptr) {
+
+        *(m_back_itr.m_block + 1) = std::make_shared<block_t>();
+      }
+
       ++m_back_itr;
       ++m_count;
+
       return m_back_itr - 1;
     }
 
@@ -862,7 +876,7 @@ private:
     //!< New MOB vector reference.
     auto& new_mob_ref{ *new_mob };
     for (size_type i{ 0 }; i < new_size; ++i) {
-      new_mob_ref[i] = std::make_shared<block_t>();
+      //  new_mob_ref[i] = std::make_shared<block_t>();
     }
     //!< Offset to center the used blocks inside the new MOB.
     const size_type offset{ (new_size - total_blocks_in_use) / 2 };
@@ -952,7 +966,7 @@ public:
       oss << "[" << map_slot_idx++ << "]";
       // Slots in the map that is not in use.
       if (sptr_blk == nullptr) {
-        oss << "<null> ";
+        oss << "<null>\n";
         continue;
       }
 

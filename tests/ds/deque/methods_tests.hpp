@@ -269,19 +269,44 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
     ds::Deque<T> deque1;
 
-    deque1.insert(deque1.begin(), 10);
-    EXPECT_EQ(deque1[0], 10);
+    deque1.insert(deque1.begin(), 1);
+    EXPECT_EQ(deque1[0], 1);
     EXPECT_EQ(deque1.size(), 1);
 
-    deque1.insert(deque1.begin(), 20);
-    EXPECT_EQ(deque1[0], 20);
+    deque1.insert(deque1.end(), 2);
+    EXPECT_EQ(deque1[1], 2);
     EXPECT_EQ(deque1.size(), 2);
 
-    deque1.insert(deque1.begin(), 30);
-    EXPECT_EQ(deque1[0], 30);
-
+    deque1.insert(deque1.begin(), 4);
+    EXPECT_EQ(deque1[0], 4);
     EXPECT_EQ(deque1.size(), 3);
-    std::cout << deque1.to_string_full() << "\n";
+
+    deque1.insert(deque1.begin(), 5);
+    EXPECT_EQ(deque1[0], 5);
+    EXPECT_EQ(deque1.size(), 4);
+    deque1.insert(deque1.begin(), 5);
+    EXPECT_EQ(deque1[0], 5);
+    EXPECT_EQ(deque1.size(), 5);
+    deque1.insert(deque1.begin(), 5);
+    EXPECT_EQ(deque1[0], 5);
+    EXPECT_EQ(deque1.size(), 6);
+    deque1.insert(deque1.begin(), 200);
+    EXPECT_EQ(deque1[0], 200);
+    EXPECT_EQ(deque1.size(), 7);
+    deque1.insert(deque1.end(), 300);
+    EXPECT_EQ(deque1[0], 200);
+    EXPECT_EQ(deque1.size(), 8);
+
+    deque1.insert(deque1.begin() + 2, 20);
+    EXPECT_EQ(deque1[0], 200);
+    EXPECT_EQ(deque1.size(), 9);
+
+    // deque1.insert(deque1.begin(), 30);
+    // EXPECT_EQ(deque1[0], 30);
+
+    // EXPECT_EQ(deque1.size(), 3);
+
+    // std::cout << deque1.to_string_full() << std::endl;
   }
 #endif
 
