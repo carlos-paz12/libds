@@ -30,7 +30,7 @@
 // [!] Test the size of a Deque.
 #define SIZE YES
 // [!] Test the resizing of a Deque.
-#define RESIZE NO
+#define RESIZE YES
 // [!] Test the capacity of a Deque.
 #define CAPACITY YES
 // [!] Test the empty state of a Deque.
@@ -191,27 +191,36 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
   {
     BEGIN_TEST(tmanager, "Resize", "deque.resize(new_size);");
 
-    ds::Deque<T> deque({ src[0], src[1], src[2], src[3], src[4] });
+    ds::Deque<T> deque;
+
+    for (std::size_t i = 0; i < size; ++i) {
+      deque.push_front(src[i]);
+    }
 
     deque.resize(3);
     EXPECT_EQ(deque.size(), 3);
-    EXPECT_EQ(deque[0], src[0]);
-    EXPECT_EQ(deque[1], src[1]);
-    EXPECT_EQ(deque[2], src[2]);
+    EXPECT_EQ(deque[0], src[size - 1]);
+    EXPECT_EQ(deque[1], src[size - 2]);
+    EXPECT_EQ(deque[2], src[size - 3]);
 
     deque.resize(6);
     EXPECT_EQ(deque.size(), 6);
-
-    EXPECT_EQ(deque[0], src[0]);
-    EXPECT_EQ(deque[1], src[1]);
-    EXPECT_EQ(deque[2], src[2]);
     EXPECT_EQ(deque[3], T());
     EXPECT_EQ(deque[4], T());
     EXPECT_EQ(deque[5], T());
 
-    auto old_size{ deque.size() };
-    deque.resize(deque.size());
+    auto old_size = deque.size();
+    deque.resize(old_size);
     EXPECT_EQ(deque.size(), old_size);
+
+    deque.resize(0);
+    EXPECT_EQ(deque.size(), 0);
+    EXPECT_TRUE(deque.empty());
+
+    deque.resize(2);
+    EXPECT_EQ(deque.size(), 2);
+    EXPECT_EQ(deque[0], T());
+    EXPECT_EQ(deque[1], T());
   }
 #endif
 
