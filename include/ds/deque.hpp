@@ -1,14 +1,16 @@
 #ifndef DEQUE_HPP
 #define DEQUE_HPP
 
-#include <algorithm>        // std::copy, std::equal, std::fill
-#include <array>            // std::array
-#include <cmath>            // std::ceil
-#include <cstddef>          // std::size_t
+#include <algorithm> // std::copy, std::equal, std::fill
+#include <array>     // std::array
+#include <cmath>     // std::ceil
+#include <cstddef>   // std::size_t
+#include <cstdlib>
 #include <initializer_list> // std::initializer_list
 #include <iostream>         // std::cout, std::endl
 #include <iterator> // std::advance, std::begin, std::end, std::ostream_iterator, std::distance
-#include <memory>  // std::unique_ptr
+#include <memory> // std::unique_ptr
+#include <ostream>
 #include <sstream> // std::ostringstream
 #include <vector>  // std::vector
 
@@ -148,13 +150,12 @@ public:
   /// @brief Operadador de subtração entre iteradores.
   difference_type operator-(const Iterator& other) const {
     // Diferença de blocos
-    difference_type block_diff = std::distance(other.m_block, this->m_block);
+    difference_type block_diff = this->m_block - other.m_block;
     block_diff *= BlockSize;
 
     // Diferença dentro dos blocos
-    difference_type this_offset = std::distance((*m_block)->begin(), m_current);
-    difference_type other_offset =
-      std::distance((*other.m_block)->begin(), other.m_current);
+    difference_type this_offset = m_current - (*m_block)->begin();
+    difference_type other_offset = other.m_current - (*other.m_block)->begin();
 
     return block_diff + (this_offset - other_offset);
   }
@@ -711,103 +712,23 @@ public:
   void pop_back() { }
 
   /// Inserts `value` before `cpos`.
-  iterator insert(iterator pos, const T& value) {
+  iterator insert(const_iterator cpos, const_reference value) {
     if (empty()) {
-      ++m_back_itr;
-      *m_front_itr.m_current = value;
-      ++m_count;
-      return m_front_itr;
+      return insert_at_back(value);
     }
 
+    difference_type index_cpos{ cpos - cbegin() };
+    iterator pos{ begin() + index_cpos };
+
     if (pos == m_front_itr) {
-      bool need_expand =
-        m_front_itr.m_current == (*m_front_itr.m_block)->begin() &&
-        m_front_itr.m_block == m_mob->begin();
-
-      if (need_expand) {
-        expand_mob(1);
-      }
-
-      if (m_front_itr.m_current == (*m_front_itr.m_block)->begin() and
-          *(std::prev(m_front_itr.m_block)) == nullptr) {
-        *(std::prev(m_front_itr.m_block)) = std::make_shared<block_t>();
-      }
-
-      --m_front_itr;
-      *m_front_itr.m_current = value;
-
-      ++m_count;
-      return m_front_itr;
+      return insert_at_front(value);
     }
 
     if (pos == m_back_itr) {
-      *m_back_itr.m_current = value;
-
-      if (m_back_itr.m_current == (*m_back_itr.m_block)->end() - 1 &&
-          m_back_itr.m_block == m_mob->end() - 1) {
-
-        expand_mob(1);
-      }
-
-      if (m_back_itr.m_current == (*m_back_itr.m_block)->end() - 1 and
-          *(m_back_itr.m_block + 1) == nullptr) {
-
-        *(m_back_itr.m_block + 1) = std::make_shared<block_t>();
-      }
-
-      ++m_back_itr;
-      ++m_count;
-
-      return m_back_itr - 1;
+      return insert_at_back(value);
     }
 
-    const bool front_is_closer{ std::distance(m_front_itr, pos) <
-                                std::distance(pos, m_back_itr) };
-    if (front_is_closer) {
-      const bool in_first_block{ m_front_itr.m_block == m_mob->begin() };
-      const bool in_first_element{ m_front_itr.m_current ==
-                                   (*m_front_itr.m_block)->begin() };
-      const bool need_alloc{ *(std::prev(m_front_itr.m_block)) == nullptr };
-
-      if (in_first_block and in_first_element) {
-        expand_mob(1);
-      }
-
-      if (in_first_element and need_alloc) {
-        *(std::prev(m_front_itr.m_block)) = std::make_shared<block_t>();
-      }
-
-      --m_front_itr;
-      iterator it{ m_front_itr };
-      while (it != pos) {
-        *it = *(it + 1);
-        ++it;
-      }
-    } else {
-      const bool in_last_block{ m_back_itr.m_block == m_mob->end() - 1 };
-      const bool in_last_element{ m_back_itr.m_current ==
-                                  (*m_back_itr.m_block)->end() - 1 };
-      const bool need_alloc{ *(std::next(m_back_itr.m_block)) == nullptr };
-
-      if (in_last_block and in_last_element) {
-        expand_mob(1);
-      }
-
-      if (in_last_element and need_alloc) {
-        *(std::next(m_back_itr.m_block)) = std::make_shared<block_t>();
-      }
-
-      ++m_back_itr;
-      iterator it{ m_back_itr };
-      while (it != pos) {
-        *it = *(it - 1);
-        --it;
-      }
-    }
-
-    *pos = value;
-    ++m_count;
-    return pos;
+    return insert_at(pos, value);
   }
 
   /// Inserts `count` copies of `value` before `cpos`.
@@ -844,6 +765,111 @@ public:
   }
 
 private:
+  [[nodiscard]] bool need_expand_before_front() const {
+    bool in_mob_start{ m_front_itr.m_block == m_mob->begin() };
+    bool in_block_start{ m_front_itr.m_current ==
+                         (*m_front_itr.m_block)->begin() };
+    return in_mob_start and in_block_start;
+  }
+
+  [[nodiscard]] bool need_allocate_before_front() const {
+    bool in_block_start{ m_front_itr.m_current ==
+                         (*m_front_itr.m_block)->begin() };
+    bool to_allocate{ *(std::prev(m_front_itr.m_block)) == nullptr };
+    return in_block_start and to_allocate;
+  }
+
+  [[nodiscard]] bool need_expand_after_back() const {
+    bool in_block_end{ m_back_itr.m_current ==
+                       (*m_back_itr.m_block)->end() - 1 };
+    bool in_mob_end{ m_back_itr.m_block == m_mob->end() - 1 };
+    return in_block_end and in_mob_end;
+  }
+
+  [[nodiscard]] bool need_allocate_after_back() const {
+    bool in_block_end{ m_back_itr.m_current ==
+                       (*m_back_itr.m_block)->end() - 1 };
+    bool to_allocate{ *(std::next(m_back_itr.m_block)) == nullptr };
+    return in_block_end and to_allocate;
+  }
+
+  iterator insert_at_front(const_reference value) {
+    if (need_expand_before_front()) {
+      expand_mob(1);
+    }
+
+    if (need_allocate_before_front()) {
+      *(std::prev(m_front_itr.m_block)) = std::make_shared<block_t>();
+    }
+
+    --m_front_itr;
+    *m_front_itr.m_current = value;
+    ++m_count;
+
+    return m_front_itr;
+  }
+
+  iterator insert_at_back(const_reference value) {
+    if (need_expand_after_back()) {
+      expand_mob(1);
+    }
+
+    if (need_allocate_after_back()) {
+      *(std::next(m_back_itr.m_block)) = std::make_shared<block_t>();
+    }
+
+    *m_back_itr.m_current = value;
+    ++m_back_itr;
+    ++m_count;
+
+    return std::prev(m_back_itr);
+  }
+
+  iterator insert_at(iterator pos, const_reference value) {
+    const bool front_is_closer{ (pos - m_front_itr) < (m_back_itr - pos) };
+
+    if (front_is_closer) {
+      if (need_expand_before_front()) {
+        difference_type index_cpos{ pos - begin() };
+        expand_mob(1);
+        pos = begin() + index_cpos;
+      }
+
+      if (need_allocate_before_front()) {
+        *(m_front_itr.m_block - 1) = std::make_shared<block_t>();
+      }
+
+      --m_front_itr;
+      iterator it{ m_front_itr };
+      while (it != pos) {
+        *it = *(it + 1);
+        ++it;
+      }
+    } else {
+      if (need_expand_after_back()) {
+        difference_type index_cpos{ pos - begin() };
+        expand_mob(1);
+        pos = begin() + index_cpos;
+      }
+
+      if (need_allocate_after_back()) {
+        *(m_back_itr.m_block + 1) = std::make_shared<block_t>();
+      }
+
+      ++m_back_itr;
+      iterator it{ m_back_itr };
+      while (it != pos) {
+        *it = *(it - 1);
+        --it;
+      }
+    }
+
+    *pos = value;
+    ++m_count;
+
+    return pos;
+  }
+
   /// Returns how many unused slots of the MOB we have at the target zone.
   // size_t free_slots(zone_e zone)
   // {
@@ -877,7 +903,8 @@ private:
    *
    * @note All iterators to the old map become invalid.
    *
-   * @postcondition The front and back iterators point to the new map of blocks.
+   * @postcondition The front and back iterators point to the new map of
+   * blocks.
    */
   void expand_mob(const size_type& extra_slots) {
     //!< Total number of blocks currently used (fully + partially).
@@ -891,15 +918,15 @@ private:
     size_type new_size{ old_mob_size };
 
     /*!
-     * Only expand the MOB if the requested extra slots exceed half of the free
-     * blocks. This prevents unnecessary over-allocation.
+     * Only expand the MOB if the requested extra slots exceed half of the
+     * free blocks. This prevents unnecessary over-allocation.
      */
     if (extra_slots > (free_blocks / 2)) {
       /*!
-       * Multiply by 2 to allocate extra space both at the beginning and end of
-       * the MOB, maintaining balance and avoiding fragmentation.
+       * Multiply by 2 to allocate extra space both at the beginning and end
+       * of the MOB, maintaining balance and avoiding fragmentation.
        */
-      new_size = total_blocks_in_use + 2 * extra_slots;
+      new_size = total_blocks_in_use + (2 * extra_slots);
     }
 
     //!< Create the new MOB vector with `new_size` blocks, all initialized to
@@ -933,8 +960,8 @@ private:
 
     //=========================================================================
     /*!
-     * Relocate the front and back iterators to the new blocks, preserving their
-     * exact position within each block.
+     * Relocate the front and back iterators to the new blocks, preserving
+     * their exact position within each block.
      */
     //!< New front block iterator.
     const auto new_front_blk{ new_mob->begin() + offset };
@@ -967,7 +994,7 @@ private:
 
   /// Returns the number of blocks partially occupied in the MOB.
   size_type partially_used_blocks() {
-    return ((m_count % BlockSize) != 0 ? 1 : 0);
+    return ((m_count == capacity()) ? 0 : 1);
   }
 
   /// Returns how many elements exist in the end block of the target `zone`.
