@@ -761,16 +761,52 @@ public:
       return m_back_itr - 1;
     }
 
-    iterator it = m_back_itr;
-    ++m_back_itr;
-    ++m_count;
+    const bool front_is_closer{ std::distance(m_front_itr, pos) <
+                                std::distance(pos, m_back_itr) };
+    if (front_is_closer) {
+      const bool in_first_block{ m_front_itr.m_block == m_mob->begin() };
+      const bool in_first_element{ m_front_itr.m_current ==
+                                   (*m_front_itr.m_block)->begin() };
+      const bool need_alloc{ *(std::prev(m_front_itr.m_block)) == nullptr };
 
-    while (it != pos) {
-      *it = *(it - 1);
-      --it;
+      if (in_first_block and in_first_element) {
+        expand_mob(1);
+      }
+
+      if (in_first_element and need_alloc) {
+        *(std::prev(m_front_itr.m_block)) = std::make_shared<block_t>();
+      }
+
+      --m_front_itr;
+      iterator it{ m_front_itr };
+      while (it != pos) {
+        *it = *(it + 1);
+        ++it;
+      }
+    } else {
+      const bool in_last_block{ m_back_itr.m_block == m_mob->end() - 1 };
+      const bool in_last_element{ m_back_itr.m_current ==
+                                  (*m_back_itr.m_block)->end() - 1 };
+      const bool need_alloc{ *(std::next(m_back_itr.m_block)) == nullptr };
+
+      if (in_last_block and in_last_element) {
+        expand_mob(1);
+      }
+
+      if (in_last_element and need_alloc) {
+        *(std::next(m_back_itr.m_block)) = std::make_shared<block_t>();
+      }
+
+      ++m_back_itr;
+      iterator it{ m_back_itr };
+      while (it != pos) {
+        *it = *(it - 1);
+        --it;
+      }
     }
 
     *pos = value;
+    ++m_count;
     return pos;
   }
 
