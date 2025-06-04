@@ -53,13 +53,13 @@
 // [!] Test the assignment of a Deque from a range using assign().
 #define ASSIGN_RANGE NO
 // [!] Test inserting an element at the front of a Deque.
-#define PUSH_FRONT NO
+#define PUSH_FRONT YES
 // [!] Test inserting an element at the back of a Deque.
-#define PUSH_BACK NO
+#define PUSH_BACK YES
 // [!] Test removing the first element of a Deque.
-#define POP_FRONT NO
+#define POP_FRONT YES
 // [!] Test removing the last element of a Deque.
-#define POP_BACK NO
+#define POP_BACK YES
 // [!] Test inserting an element at a specific position in a Deque.
 #define INSERT NO
 // [!] Test inserting multiple copies of an element at a position in a
@@ -70,9 +70,9 @@
 // [!] Test inserting a range of elements into a Deque.
 #define INSERT_RANGE NO
 // [!] Test erasing an element at a specific position in a Deque.
-#define ERASE YES
+#define ERASE NO
 // [!] Test erasing an element at a specific position in a const Deque.
-#define ERASE_CONST YES
+#define ERASE_CONST NO
 // [!] Test erasing a range of elements from a Deque.
 #define ERASE_RANGE NO
 // [!] Test erasing a range of elements from a const Deque.
@@ -270,15 +270,101 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 #endif
 
 #if PUSH_FRONT
+  {
+    BEGIN_TEST(tmanager, "Push front", "deque.push_front(value);");
+
+    ds::Deque<T, 3, 3> deque;
+
+    for (std::size_t i = 0; i < size; ++i) {
+      deque.push_front(src[i]);
+      EXPECT_EQ(deque.front(), src[i]);
+    }
+
+    EXPECT_EQ(deque.size(), src.size());
+
+    // Verifica ordem invertida
+    for (std::size_t i = 0; i < size; ++i) {
+      EXPECT_EQ(deque[i], src[size - i - 1]);
+    }
+  }
 #endif
 
 #if PUSH_BACK
+  {
+    BEGIN_TEST(tmanager, "Push back", "deque.push_back(value);");
+
+    ds::Deque<T, 3, 3> deque;
+
+    for (std::size_t i = 0; i < size; ++i) {
+      deque.push_back(src[i]);
+      EXPECT_EQ(deque.back(), src[i]);
+    }
+
+    EXPECT_EQ(deque.size(), src.size());
+
+    // Verifica ordem normal
+    for (std::size_t i = 0; i < size; ++i) {
+      EXPECT_EQ(deque[i], src[i]);
+    }
+  }
 #endif
 
 #if POP_FRONT
+  {
+    BEGIN_TEST(tmanager, "Pop front", "deque.pop_front();");
+
+    ds::Deque<T, 3, 3> deque;
+
+    for (std::size_t i = 0; i < size; ++i) {
+      deque.push_back(src[i]);
+    }
+
+    EXPECT_EQ(deque.size(), src.size());
+
+    T first_val = deque.front();
+    deque.pop_front();
+    EXPECT_NE(deque.front(), first_val);
+    EXPECT_EQ(deque.size(), src.size() - 1);
+
+    // Esvazia o deque
+    while (!deque.empty()) {
+      deque.pop_front();
+    }
+
+    EXPECT_TRUE(deque.empty());
+
+    // Pop em vazio
+    deque.pop_front(); // Deve ser seguro
+    EXPECT_TRUE(deque.empty());
+  }
 #endif
 
 #if POP_BACK
+  {
+    BEGIN_TEST(tmanager, "Pop back", "deque.pop_back();");
+
+    ds::Deque<T, 3, 3> deque;
+
+    for (std::size_t i = 0; i < size; ++i) {
+      deque.push_back(src[i]);
+    }
+
+    EXPECT_EQ(deque.size(), src.size());
+
+    T last_val = deque.back();
+    deque.pop_back();
+    EXPECT_NE(deque.back(), last_val);
+    EXPECT_EQ(deque.size(), src.size() - 1);
+
+    while (not deque.empty()) {
+      deque.pop_back();
+    }
+
+    EXPECT_TRUE(deque.empty());
+
+    deque.pop_back();
+    EXPECT_TRUE(deque.empty());
+  }
 #endif
 
 #if INSERT
