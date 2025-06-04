@@ -683,6 +683,7 @@ public:
 
   const_reference front() const { return *cbegin(); }
 
+  // reference back() { return *(end() - 1); }
   reference back() { return *(--end()); }
 
   const_reference back() const { return *(--cend()); }
@@ -700,16 +701,24 @@ public:
   void assign(const std::initializer_list<T>& il) { }
 
   /// Insert `value` at the beginning of the Deque.
-  void push_front(const_reference value) { insert(cbegin(), value); }
+  void push_front(const_reference value) { insert_at_front(value); }
 
   /// Insert `value` at the end of the Deque.
-  void push_back(const_reference value) { insert(cend(), value); }
+  void push_back(const_reference value) { insert_at_back(value); }
 
   /// Remove the first element of the Deque.
-  void pop_front() { }
+  void pop_front() {
+    if (not empty()) {
+      erase(begin());
+    }
+  }
 
   /// Remove the last element of the Deque.
-  void pop_back() { }
+  void pop_back() {
+    if (not empty()) {
+      erase((m_back - 1));
+    }
+  }
 
   /// Inserts `value` before `cpos`.
   iterator insert(const_iterator cpos, const_reference value) {
@@ -792,10 +801,10 @@ public:
   }
 
   /// Removes the elements in the range `[first,last)`.
-  iterator erase(iterator first, iterator last) { }
+  // iterator erase(iterator first, iterator last) { }
 
-  /// Removes the elements in the range `[first,last)`.
-  iterator erase(const_iterator first, const_iterator last) { }
+  // /// Removes the elements in the range `[first,last)`.
+  // iterator erase(const_iterator first, const_iterator last) { }
 
   /// Remove all elements from the Deque.
   void clear() {
