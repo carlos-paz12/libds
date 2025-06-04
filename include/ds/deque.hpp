@@ -683,7 +683,6 @@ public:
 
   const_reference front() const { return *cbegin(); }
 
-  // reference back() { return *(end() - 1); }
   reference back() { return *(--end()); }
 
   const_reference back() const { return *(--cend()); }
