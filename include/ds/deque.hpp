@@ -784,8 +784,12 @@ public:
     }
   }
 
-  /// Removes the element at `pos`.
-  iterator erase(const_iterator cpos) { }
+  /// Removes the element at `cpos`.
+  iterator erase(const_iterator cpos) {
+    difference_type index_cpos{ cpos - cbegin() };
+    iterator pos{ begin() + index_cpos };
+    return erase(pos);
+  }
 
   /// Removes the elements in the range `[first,last)`.
   iterator erase(iterator first, iterator last) { }

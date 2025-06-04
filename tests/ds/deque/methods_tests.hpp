@@ -72,7 +72,7 @@
 // [!] Test erasing an element at a specific position in a Deque.
 #define ERASE YES
 // [!] Test erasing an element at a specific position in a const Deque.
-#define ERASE_CONST NO
+#define ERASE_CONST YES
 // [!] Test erasing a range of elements from a Deque.
 #define ERASE_RANGE NO
 // [!] Test erasing a range of elements from a const Deque.
@@ -328,7 +328,7 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
 #if ERASE
   {
-    BEGIN_TEST(tmanager, "Erase", "deque.erase(pos);");
+    BEGIN_TEST(tmanager, "Erase", "deque.erase(iterator);");
 
     ds::Deque<T, 3, 3> deque1;
 
@@ -369,6 +369,45 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 #endif
 
 #if ERASE_CONST
+  {
+    BEGIN_TEST(tmanager, "Erase const", "deque.erase(const_iterator);");
+
+    ds::Deque<T, 3, 3> deque1;
+
+    for (std::size_t i{ 0 }; i < size; ++i) {
+      deque1.insert(deque1.cbegin(), src[i]);
+    }
+
+    EXPECT_EQ(deque1.size(), src.size());
+
+    T old_front = deque1[0];
+    deque1.erase(deque1.cbegin());
+    EXPECT_NE(deque1[0], old_front);
+    EXPECT_EQ(deque1.size(), src.size() - 1);
+
+    T old_back = deque1[deque1.size() - 1];
+    auto it_back = deque1.erase(deque1.cend() - 1);
+    EXPECT_EQ(it_back, deque1.end());
+    EXPECT_NE(deque1[deque1.size() - 1], old_back);
+    EXPECT_EQ(deque1.size(), src.size() - 2);
+
+    auto middle_it = deque1.cbegin() + (deque1.size() / 2);
+    T middle_val = *middle_it;
+    deque1.erase(middle_it);
+    EXPECT_NE(deque1[deque1.size() / 2], middle_val);
+    EXPECT_EQ(deque1.size(), src.size() - 3);
+
+    ds::Deque<T, 3, 3> deque_single;
+    deque_single.push_back(src[0]);
+    EXPECT_EQ(deque_single.size(), 1);
+    auto it_single = deque_single.erase(deque_single.cbegin());
+    EXPECT_EQ(deque_single.size(), 0);
+    EXPECT_EQ(it_single, deque_single.end());
+
+    ds::Deque<T, 3, 3> deque2;
+    auto it2 = deque2.erase(deque2.cend());
+    EXPECT_EQ(it2, deque2.end());
+  }
 #endif
 
 #if ERASE_RANGE
