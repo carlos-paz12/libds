@@ -109,9 +109,7 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
 #if RANGE_CTRO
   {
-    BEGIN_TEST(tmanager,
-               "Range constructor",
-               "ds::Deque<T> deque(src.begin(), src.end());");
+    BEGIN_TEST(tmanager, "Range constructor", "ds::Deque<T> deque(src.begin(), src.end());");
 
     ds::Deque<T> deque(src.begin(), src.end());
 
@@ -136,8 +134,7 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
     EXPECT_EQ(deque2.capacity(), deque1.capacity());
     EXPECT_FALSE(deque2.empty());
 
-    for (std::size_t i{ 0 }; i < deque1.size(); ++i)
-      EXPECT_EQ(deque2[i], deque1[i]);
+    for (std::size_t i{ 0 }; i < deque1.size(); ++i) EXPECT_EQ(deque2[i], deque1[i]);
 
     deque1[0] = 99;
     EXPECT_NE(deque2[0], deque1[0]);
@@ -146,9 +143,7 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
 #if INIT_LIST_CTRO
   {
-    BEGIN_TEST(tmanager,
-               "Initializer list",
-               "ds::Deque<T> deque({src[0], src[1], src[2], src[3], src[4]});");
+    BEGIN_TEST(tmanager, "Initializer list", "ds::Deque<T> deque({src[0], src[1], src[2], src[3], src[4]});");
 
     ds::Deque<T> deque({ src[0], src[1], src[2], src[3], src[4] });
 
@@ -259,7 +254,7 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
     EXPECT_EQ(deque.front(), src[0]);
 
-    deque.back() = deque.back() + 100;
+    deque.front() = deque.back() + 100;
     EXPECT_NE(deque.front(), src[0]);
   }
 #endif
