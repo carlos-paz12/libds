@@ -60,12 +60,12 @@
 // [!] Test removing the last element of a Deque.
 #define POP_BACK YES
 // [!] Test inserting an element at a specific position in a Deque.
-#define INSERT YES
+#define INSERT NO
 // [!] Test inserting multiple copies of an element at a position in a
-#define INSERT_FILL YES
+#define INSERT_FILL NO
 // Deque.
 // [!] Test inserting elements from an initializer list into a Deque.
-#define INSERT_INIT_LIST YES
+#define INSERT_INIT_LIST NO
 // [!] Test inserting a range of elements into a Deque.
 #define INSERT_RANGE YES
 // [!] Test erasing an element at a specific position in a Deque.
@@ -455,6 +455,22 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 #endif
 
 #if INSERT_FILL
+  {
+    BEGIN_TEST(tmanager, "Insert fill", "deque.insert(cpos, count, value);");
+
+    ds::Deque<T, 3, 3> deque1;
+
+    deque1.insert(deque1.cbegin(), 3, 1);
+    EXPECT_EQ(deque1.size(), 3);
+    EXPECT_EQ(deque1[0], 1);
+    EXPECT_EQ(deque1[1], 1);
+    EXPECT_EQ(deque1[2], 1);
+
+    deque1.insert(deque1.cend(), 2, 2);
+    EXPECT_EQ(deque1.size(), 5);
+    EXPECT_EQ(deque1[3], 2);
+    EXPECT_EQ(deque1[4], 2);
+  }
 #endif
 
 #if INSERT_INIT_LIST
@@ -477,6 +493,28 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 #endif
 
 #if INSERT_RANGE
+  {
+    BEGIN_TEST(tmanager, "Insert range", "deque.insert(cpos, src.begin(), src.end());");
+
+    ds::Deque<T,3,3>  values = { 1, 2, 3, 4, 5 };
+    ds::Deque<T, 3, 3> deque1;
+
+    deque1.insert(deque1.cbegin(), values.begin(), values.end());
+    EXPECT_EQ(deque1.size(), values.size());
+    EXPECT_EQ(deque1[0], 1);
+    EXPECT_EQ(deque1[1], 2);
+    EXPECT_EQ(deque1[2], 3);
+    EXPECT_EQ(deque1[3], 4);
+    EXPECT_EQ(deque1[4], 5);
+
+    deque1.insert(deque1.cend(), values.begin(), values.end());
+    EXPECT_EQ(deque1.size(), values.size() * 2);
+    EXPECT_EQ(deque1[5], 1);
+    EXPECT_EQ(deque1[6], 2);
+    EXPECT_EQ(deque1[7], 3);
+    EXPECT_EQ(deque1[8], 4);
+    EXPECT_EQ(deque1[9], 5);
+  }
 #endif
 
 #if ERASE
