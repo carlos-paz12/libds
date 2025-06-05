@@ -6,22 +6,20 @@
 #include "iterator_tests.hpp"
 #include "methods_tests.hpp"
 
-#define YES 1
-#define NO 0
-
 int main() {
-  // constexpr std::array<int, 5> values_i{ 1, 2, 3, 4, 5 };
-  constexpr std::array<int, 5> source_i{ 6, 7, 8, 9, 0 };
+  const std::array<int, 5> values_i{ 1, 2, 3, 4, 5 };
+  std::cout << ">>> Testing out Deque with integers values.\n";
+  run_regular_deque_tests<int, values_i.size()>(values_i);
 
-  std::cout << ">>> Testing out deque with integers.\n";
-  run_regular_deque_tests<int, 5>(source_i);
+  const std::array<double, 5> values_d{ 1.9, 2.64, 3.14, 4.0, -2 };
+  std::cout << "\n>>> Testing out Deque with double values.\n";
+  run_regular_deque_tests<double, values_d.size()>(values_d);
 
-  // std::array<std::string, 5> values_s{"1", "2", "3", "4", "5"};
-  // std::array<std::string, 5> source_s{"6", "7", "8", "9", "10"};
-  // std::cout << ">>> Testing out deque with strings.\n";
-  // run_regular_deque_tests<std::string, 5>(values_s, source_s);
+  const std::array<std::string, 5> values_s{ "6", "7", "8", "9", "0" };
+  std::cout << "\n>>> Testing out Deque with strings values.\n";
+  run_regular_deque_tests<std::string, values_s.size()>(values_s);
 
-  std::cout << "\n>>> Testing out iterator operations on deque.\n";
+  std::cout << "\n>>> Testing out iterator operations on Deque.";
   run_iterator_tests<ds::Deque<int>>();
 
   return 1;
