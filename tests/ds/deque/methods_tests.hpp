@@ -46,7 +46,7 @@
 // [!] Test the access to the last element of a const Deque.
 #define BACK_CONST NO
 // [!] Test the assignment of a Deque using the assign() method.
-#define ASSIGN YES
+#define ASSIGN_COUNT YES
 // [!] Test the assignment of a Deque from an initializer list using assign().
 #define ASSIGN_INIT_LIST YES
 // [!] Test the assignment of a Deque from a range using assign().
@@ -314,13 +314,70 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
   }
 #endif
 
-#if ASSIGN
+#if ASSIGN_COUNT
+  {
+    BEGIN_TEST(tmanager, "Assign count", "deque.assign(count, value);");
+
+    ds::Deque<T> deque;
+    deque.assign(size, src[0]);
+
+    EXPECT_EQ(deque.size(), src.size());
+    for (std::size_t i = 0; i < deque.size(); ++i) {
+      EXPECT_EQ(deque[i], src[0]);
+    }
+
+    deque.assign(size, src[1]);
+
+    EXPECT_EQ(deque.size(), src.size());
+    for (std::size_t i = 0; i < deque.size(); ++i) {
+      EXPECT_NE(deque[i], src[0]);
+      EXPECT_EQ(deque[i], src[1]);
+    }
+  }
 #endif
 
 #if ASSIGN_INIT_LIST
+  {
+    BEGIN_TEST(tmanager, "Assign initializer list", "deque.assign({src[0], src[1], src[2], src[3], src[4]});");
+
+    ds::Deque<T> deque;
+
+    deque.assign({ src[0], src[1], src[2], src[3], src[4] });
+
+    EXPECT_EQ(deque.size(), 5);
+    for (std::size_t i = 0; i < 5; ++i) {
+      EXPECT_EQ(deque[i], src[i]);
+    }
+
+    deque.assign({ src[4], src[3], src[2], src[1], src[0] });
+
+    EXPECT_EQ(deque.size(), 5);
+    for (std::size_t i = 0; i < 5; ++i) {
+      EXPECT_EQ(deque[i], src[4 - i]);
+    }
+  }
 #endif
 
 #if ASSIGN_RANGE
+  {
+    BEGIN_TEST(tmanager, "Assign range", "deque.assign(src.begin(), src.end());");
+
+    ds::Deque<T> deque;
+
+    deque.assign(src.begin(), src.end());
+
+    EXPECT_EQ(deque.size(), src.size());
+    for (std::size_t i = 0; i < src.size(); ++i) {
+      EXPECT_EQ(deque[i], src[i]);
+    }
+
+    deque.assign(src.rbegin(), src.rend());
+
+    EXPECT_EQ(deque.size(), src.size());
+    for (std::size_t i = 0; i < src.size(); ++i) {
+      EXPECT_EQ(deque[i], src[src.size() - i - 1]);
+    }
+  }
 #endif
 
 #if PUSH_FRONT
