@@ -458,6 +458,22 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 #endif
 
 #if INSERT_INIT_LIST
+  {
+    BEGIN_TEST(tmanager, "Insert initializer list", "deque.insert(cpos, {1, 2, 3});");
+
+    ds::Deque<T, 3, 3> deque1;
+
+    deque1.insert(deque1.cbegin(), { 1, 2, 3 });
+    EXPECT_EQ(deque1.size(), 3);
+    EXPECT_EQ(deque1[0], 1);
+    EXPECT_EQ(deque1[1], 2);
+    EXPECT_EQ(deque1[2], 3);
+
+    deque1.insert(deque1.cend(), { 4, 5 });
+    EXPECT_EQ(deque1.size(), 5);
+    EXPECT_EQ(deque1[3], 4);
+    EXPECT_EQ(deque1[4], 5);
+  }
 #endif
 
 #if INSERT_RANGE
