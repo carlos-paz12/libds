@@ -614,9 +614,8 @@ public:
       throw std::out_of_range("Deque::operator[]: index out of range");
     }
     // [1] Calculate the block and position inside the block.
-    size_type block_index{ idx / BlockSize };
-    size_type pos_in_block{ idx % BlockSize };
-    return (*(*m_mob)[block_index])[pos_in_block];
+    iterator block_index{ m_front + idx };
+    return (*block_index.m_current);
   }
 
   /// Returns a const ref. to the element at specified location pos.
@@ -629,9 +628,8 @@ public:
       throw std::out_of_range("Deque::operator[]: index out of range");
     }
     // [1] Calculate the block and position inside the block.
-    size_type block_index{ idx / BlockSize };
-    size_type pos_in_block{ idx % BlockSize };
-    return (*(*m_mob)[block_index])[pos_in_block];
+    iterator block_index{ m_front + idx };
+    return (*block_index.m_current);
   }
 
   reference front() { return *begin(); }
