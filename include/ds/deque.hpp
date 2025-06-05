@@ -649,9 +649,8 @@ public:
     }
   }
 
-  /// Replaces the content of the Deque with the values from the
-  /// initializer_list.
-  void assign(const std::initializer_list<T>& il) { }
+  /// Replaces the content of the Deque with the values from the initializer_list.
+  void assign(const std::initializer_list<T>& il) { assign(il.begin(), il.end()); }
 
   /// Replaces the content of the Deque with the values from [first,last).
   template<typename InputIt, typename = typename std::iterator_traits<InputIt>::iterator_category>
