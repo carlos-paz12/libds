@@ -698,7 +698,14 @@ public:
   iterator insert(const_iterator cpos, size_type count, const T& value) { }
 
   /// Inserts elements from an initializer_list before  `cpos`.
-  iterator insert(const_iterator cpos, const std::initializer_list<T>& il) { }
+  iterator insert(const_iterator cpos, const std::initializer_list<T>& il) {
+    iterator pos{ begin() + (cpos - cbegin()) }; 
+    for (const auto& value : il) {
+      pos = insert(const_iterator(pos.m_block, pos.m_current), value);
+      ++pos; //> Avança para a próxima posição
+    }
+    return pos; //> Retorna o último iterador válido
+  }
 
   /// Inserts elements from range [first, last) before `cpos`.
   template<class InputIt>
