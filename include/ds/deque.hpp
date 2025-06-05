@@ -642,7 +642,12 @@ public:
 
   //================================================== MODIFIERS:
   /// Replaces the content of the Deque with 'count' copies f 'value'.
-  void assign(size_type count, const T& value) { }
+  void assign(size_type count, const_reference value) {
+    clear();
+    for (size_type i{ 0 }; i < count; ++i) {
+      push_back(value);
+    }
+  }
 
   /// Replaces the content of the Deque with the values from [first,last).
   template<typename InputIt>

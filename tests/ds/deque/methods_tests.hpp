@@ -46,11 +46,11 @@
 // [!] Test the access to the last element of a const Deque.
 #define BACK_CONST NO
 // [!] Test the assignment of a Deque using the assign() method.
-#define ASSIGN NO
+#define ASSIGN YES
 // [!] Test the assignment of a Deque from an initializer list using assign().
-#define ASSIGN_INIT_LIST NO
+#define ASSIGN_INIT_LIST YES
 // [!] Test the assignment of a Deque from a range using assign().
-#define ASSIGN_RANGE NO
+#define ASSIGN_RANGE YES
 // [!] Test inserting an element at the front of a Deque.
 #define PUSH_FRONT NO
 // [!] Test inserting an element at the back of a Deque.
@@ -76,7 +76,7 @@
 // [!] Test erasing a range of elements from a const Deque.
 #define ERASE_RANGE_CONST NO
 // [!] Test clearing all elements from a Deque.
-#define CLEAR YES
+#define CLEAR NO
 
 template<typename T, std::size_t size>
 void run_regular_deque_tests(const std::array<T, size>& src) {
