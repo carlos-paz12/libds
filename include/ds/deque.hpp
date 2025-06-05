@@ -649,13 +649,20 @@ public:
     }
   }
 
-  /// Replaces the content of the Deque with the values from [first,last).
-  template<typename InputIt>
-  void assign(InputIt first, InputIt last) { }
-
   /// Replaces the content of the Deque with the values from the
   /// initializer_list.
   void assign(const std::initializer_list<T>& il) { }
+
+  /// Replaces the content of the Deque with the values from [first,last).
+  template<typename InputIt, typename = typename std::iterator_traits<InputIt>::iterator_category>
+  void assign(InputIt first, InputIt last) {
+    clear();
+    auto runner{ first };
+    while (runner != last) {
+      push_back(*runner);
+      ++runner;
+    }
+  }
 
   /// Insert `value` at the beginning of the Deque.
   void push_front(const_reference value) { insert_at_front(value); }
