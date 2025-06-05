@@ -776,10 +776,26 @@ public:
   }
 
   /// Removes the elements in the range `[first,last)`.
-  // iterator erase(iterator first, iterator last) { }
+  iterator erase(iterator first, iterator last) {
+    if (first == last) return last;
+    iterator runner{ first };
+    while (runner != last) {
+      erase(runner);
+      ++runner;
+    }
+    return runner;
+  }
 
-  // /// Removes the elements in the range `[first,last)`.
-  // iterator erase(const_iterator first, const_iterator last) { }
+  /// Removes the elements in the range `[first,last)`.
+  iterator erase(const_iterator first, const_iterator last) {
+    difference_type index_first{ first - cbegin() };
+    difference_type index_last{ last - cbegin() };
+
+    iterator it_first{ begin() + index_first };
+    iterator it_last{ begin() + index_last };
+
+    return erase(it_first, it_last);
+  }
 
   /// Remove all elements from the Deque.
   void clear() {
