@@ -804,22 +804,23 @@ public:
 
   /// Remove all elements from the Deque.
   void clear() {
+    if (empty()) return;
     // [!] Traverse all blocks in m_mob and reset them.
-    for (auto& block : *m_mob) {
+    iterator it{ begin() };
+    while (it != end()) {
       // [!] Checks if bloco is allocated (not nullptr).
-      if (block) {
-        block->fill(value_type());
-      }
+      *it = value_type();
+      ++it;
     }
 
     //!< Offset to determine the starting block (center of the map).
-    size_type offset_mob_start{ DefaultBlkMapSize / 2 };
+    size_type offset_mob_start{ m_mob->size() / 2 };
     //!< Offset to determine the starting element within the starting block (center).
     size_type offset_block_start{ BlockSize / 2 };
 
     // [!] Reset iterators to the middle of the block map.
     m_front = iterator(m_mob->begin() + offset_mob_start, (*m_mob)[offset_mob_start]->begin() + offset_block_start);
-    m_back = m_front;
+    m_back = iterator(m_mob->begin() + offset_mob_start, (*m_mob)[offset_mob_start]->begin() + offset_block_start);
 
     // [!] Reset element count.
     m_count = 0;
