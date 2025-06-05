@@ -695,19 +695,18 @@ public:
   }
 
   /// Inserts `count` copies of `value` before `cpos`.
-  iterator insert(const_iterator cpos, size_type count, const T& value) { 
-  //  iterator pos{ begin() + (cpos - cbegin()) }; 
-  //   for (size_type i = 0; i < count; ++i) {
-  //     pos = insert(const_iterator(pos.m_block, pos.m_current), value);
-  //     ++pos; //> Avança para a próxima posição
-  //   }
-  //   return pos; //> Retorna o último iterador válido
-
+  iterator insert(const_iterator cpos, size_type count, const T& value) {
+    iterator pos{ begin() + (cpos - cbegin()) };
+    for (size_type i = 0; i < count; ++i) {
+      pos = insert(const_iterator(pos.m_block, pos.m_current), value);
+      ++pos; //> Avança para a próxima posição
+    }
+    return pos; //> Retorna o último iterador válido
   }
 
   /// Inserts elements from an initializer_list before  `cpos`.
   iterator insert(const_iterator cpos, const std::initializer_list<T>& il) {
-    iterator pos{ begin() + (cpos - cbegin()) }; 
+    iterator pos{ begin() + (cpos - cbegin()) };
     for (const auto& value : il) {
       pos = insert(const_iterator(pos.m_block, pos.m_current), value);
       ++pos; //> Avança para a próxima posição
@@ -716,12 +715,14 @@ public:
   }
 
   /// Inserts elements from range [first, last) before `cpos`.
-  template<class InputIt>
-  iterator insert(const_iterator cpos, InputIt first, InputIt last) { 
-    iterator pos{ begin() + (cpos - cbegin()) }; 
-    for (; first != last; ++first) {
-      pos = insert(const_iterator(pos.m_block, pos.m_current), *first);
-      ++pos; //> Avança para a próxima posição
+  template<class InputIt, typename = typename std::iterator_traits<InputIt>::iterator_category>
+  iterator insert(const_iterator cpos, InputIt first, InputIt last) {
+    iterator pos{ begin() + (cpos - cbegin()) };
+    InputIt runner{ first };
+    while (runner != last) {
+      pos = insert(const_iterator(pos.m_block, pos.m_current), *runner);
+      ++pos;
+      runner++;
     }
     return pos; //> Retorna o último iterador válido
   }

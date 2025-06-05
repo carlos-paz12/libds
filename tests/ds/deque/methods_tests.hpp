@@ -16,17 +16,17 @@
 #define NO 0
 
 // [!] Test the construction of an empty Deque.
-#define DEFAULT_CTRO NO
+#define DEFAULT_CTRO YES
 // [!] Test the construction of a Deque with `n` elements.
-#define FILL_CTRO NO
+#define FILL_CTRO YES
 // [!] Test the construction of a Deque from a given interval.
-#define RANGE_CTRO NO
+#define RANGE_CTRO YES
 // [!] Test the construction of a Deque from another Deque.
-#define COPY_CTRO NO
+#define COPY_CTRO YES
 // [!] Test the construction of a Deque from an initializer list.
-#define INIT_LIST_CTRO NO
+#define INIT_LIST_CTRO YES
 // [!] Test the assignment of a Deque.
-#define ASSIGN_OP NO
+#define ASSIGN_OP YES
 // [!] Test the size of a Deque.
 #define SIZE YES
 // [!] Test the resizing of a Deque.
@@ -60,12 +60,11 @@
 // [!] Test removing the last element of a Deque.
 #define POP_BACK YES
 // [!] Test inserting an element at a specific position in a Deque.
-#define INSERT NO
-// [!] Test inserting multiple copies of an element at a position in a
-#define INSERT_FILL NO
-// Deque.
+#define INSERT YES
+// [!] Test inserting multiple copies of an element at a position in a Deque.
+#define INSERT_FILL YES
 // [!] Test inserting elements from an initializer list into a Deque.
-#define INSERT_INIT_LIST NO
+#define INSERT_INIT_LIST YES
 // [!] Test inserting a range of elements into a Deque.
 #define INSERT_RANGE YES
 // [!] Test erasing an element at a specific position in a Deque.
@@ -496,7 +495,7 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
   {
     BEGIN_TEST(tmanager, "Insert range", "deque.insert(cpos, src.begin(), src.end());");
 
-    ds::Deque<T,3,3>  values = { 1, 2, 3, 4, 5 };
+    ds::Deque<T, 3, 3> values = { 1, 2, 3, 4, 5 };
     ds::Deque<T, 3, 3> deque1;
 
     deque1.insert(deque1.cbegin(), values.begin(), values.end());
