@@ -72,11 +72,11 @@
 // [!] Test erasing an element at a specific position in a const Deque.
 #define ERASE_CONST NO
 // [!] Test erasing a range of elements from a Deque.
-#define ERASE_RANGE YES
+#define ERASE_RANGE NO
 // [!] Test erasing a range of elements from a const Deque.
-#define ERASE_RANGE_CONST YES
+#define ERASE_RANGE_CONST NO
 // [!] Test clearing all elements from a Deque.
-#define CLEAR NO
+#define CLEAR YES
 
 template<typename T, std::size_t size>
 void run_regular_deque_tests(const std::array<T, size>& src) {
@@ -640,6 +640,22 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 #endif
 
 #if CLEAR
+  {
+    BEGIN_TEST(tmanager, "Clear", "deque.clear();");
+
+    ds::Deque<T, 3, 3> deque;
+
+    for (std::size_t i{ 0 }; i < size; ++i) {
+      deque.push_back(src[i]);
+    }
+
+    auto old_capacity{ deque.capacity() };
+    deque.clear();
+
+    EXPECT_EQ(deque.size(), 0);
+    EXPECT_EQ(deque.capacity(), old_capacity);
+    EXPECT_EQ(deque.begin(), deque.end());
+  }
 #endif
 
   tmanager.summary();
