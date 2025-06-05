@@ -10,6 +10,7 @@
  *
  */
 #include "../../../include/ds/deque.hpp"
+#include <cstddef>
 #include <iostream>
 
 void test_Constructs() {
@@ -202,14 +203,9 @@ void test_methods() {
   std::cout << "Testando o método capacity():\n";
   std::cout << d.capacity() << "\n"; // Deve imprimir: 12
   std::cout << "\n";
-  // apagar depois
-  std::cout << "Testando used_blocks():\n";
-  std::cout << " blocos que estão 100% ocupados"
-            << "\n\n";
-  // apagar depois
 
   std::cout << "Testando operador[]:\n";
-  for (int i{ 0 }; i < d.size(); i++) {
+  for (size_t i{ 0 }; i < d.size(); i++) {
     auto it{ d.begin() };
     std::cout << it.to_string() << "value -> " << d[i] << "\n";
     ++it;
@@ -225,7 +221,7 @@ void test_methods() {
   std::cout << "\n";
 
   std::cout << "Testando operador at()\n";
-  for (int i{ 0 }; i < d.size(); i++) {
+  for (size_t i{ 0 }; i < d.size(); i++) {
     auto it{ d.begin() };
     std::cout << it.to_string() << "value -> " << d.at(i) << "\n";
     ++it;
