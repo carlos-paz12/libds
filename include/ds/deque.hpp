@@ -1,9 +1,10 @@
 #ifndef DEQUE_HPP
 #define DEQUE_HPP
 
-#include <array>     // std::array
-#include <cmath>     // std::floor, std::ceil
-#include <cstddef>   // std::size_t, ptrdiff_t
+#include <array>   // std::array
+#include <cmath>   // std::floor, std::ceil
+#include <cstddef> // std::size_t, ptrdiff_t
+#include <iostream>
 #include <iterator>  // std::iterator_traits, std::distance
 #include <memory>    // std::shared_ptr, std::unique_ptr, std::make_shared, std::make_unique
 #include <sstream>   // std::ostringstream
@@ -46,7 +47,7 @@ private:
   std::unique_ptr<block_list_t> m_mob; //!< The dynamic map of blocks.
   iterator m_front;                    //!< Iterator to the front block.
   iterator m_back;                     //!< Iterator to the back block.
-  size_t m_count{ 0 };                 //!< # of elements stored in the map.
+  std::size_t m_count;                 //!< # of elements stored in the map.
 
 public:
   //================================================== MEMBER FUNCTIONS
@@ -55,9 +56,7 @@ public:
 
    * Constructs an empty Deque.
    */
-  Deque() {
-    m_mob = std::make_unique<block_list_t>(DefaultBlkMapSize);
-
+  Deque() : m_mob(std::make_unique<block_list_t>(DefaultBlkMapSize)), m_count(0) {
     /*!
      * In default case, `start_block` will be given the floor value of 1/2, i.e.
      * 0. And `start_index` will be given the floor value of 3/2, i.e 1.
@@ -93,18 +92,18 @@ public:
      *                                    v    v
      * Deque<int, 5, 3> = { *[- - - - -] *[- - - - -] *[- - - - -] }
      */
-    //!< Offset to define who is it initial block.
-    size_type offset_initial_blk{ static_cast<size_type>(std::floor(DefaultBlkMapSize / 2)) };
-    //!< Offset to define who is it initial element in initial block.
-    size_type offset_initial_element{ static_cast<size_type>(std::floor(BlockSize / 2)) };
 
-    (*m_mob)[offset_initial_blk] = std::make_shared<block_t>();
+    //!< Offset to determine the starting block (center of the map).
+    size_type offset_mob{ m_mob->size() / 2 };
+    //!< Offset to determine the starting element within the starting block (center).
+    size_type offset_block{ BlockSize / 2 };
 
-    m_front =
-      iterator(m_mob->begin() + offset_initial_blk, (*m_mob)[offset_initial_blk]->begin() + offset_initial_element);
+    // [!] Allocates a block only to the central iterators.
+    (*m_mob)[offset_mob] = std::make_shared<block_t>();
 
-    m_back =
-      iterator(m_mob->begin() + offset_initial_blk, (*m_mob)[offset_initial_blk]->begin() + offset_initial_element);
+    // [!] Set iterators to the middle of the block map.
+    m_front = iterator(m_mob->begin() + offset_mob, (*m_mob)[offset_mob]->begin() + offset_block);
+    m_back = iterator(m_mob->begin() + offset_mob, (*m_mob)[offset_mob]->begin() + offset_block);
   }
 
   /**
@@ -114,35 +113,25 @@ public:
    * `value_type`. If `value` is not provided, a default constructor
    * `value_type()` is used.
    */
-  explicit Deque(size_type n, const_reference value = value_type()) {
-    // Número de blocos necessários para armazenar n elementos
-    size_type blocks_needed{ static_cast<size_type>(std::ceil((n + BlockSize - 1) / BlockSize)) };
+  explicit Deque(size_type n, const_reference value = value_type()) : m_count(n) {
+    size_type blocks_needed{ (n + BlockSize - 1) / BlockSize };
+    size_type map_size{ std::max(DefaultBlkMapSize, blocks_needed) };
 
-    // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
-    size_type map_size{ blocks_needed + 1 }; // adiciona 1 blocos extra
-    // Inicializa o vetor de blocos com ponteiros nulos
     m_mob = std::make_unique<block_list_t>(map_size);
-    // Aloca os blocos
-    for (size_type i{ 0 }; i < map_size; ++i) {
-      (*m_mob)[i] = std::make_shared<block_t>(); // O tamanho do bloco está
-                                                 // definido em `block_t`.
+    for (size_type i{ 0 }; i < blocks_needed; ++i) {
+      (*m_mob)[i] = std::make_shared<block_t>();
     }
-    // Posição central onde os dados começarão
-    size_type start_block{ 0 };
-    // Inicializa iterador para o início (posição lógica 0)
-    m_front = iterator(m_mob->begin() + start_block,  // iterador para o bloco do início
-                       (*m_mob)[start_block]->begin() // iterador para a posição inicial dentro do bloco
-    );
 
-    // Preenche os elementos com 'value'
+    // [!] Set iterators to the start of the block map.
+    m_front = iterator(m_mob->begin(), (*m_mob)[0]->begin());
+
     iterator it{ m_front };
-    for (size_type i = 0; i < n; ++i) {
+    for (size_type i{ 0 }; i < n; ++i) {
       *(it) = value;
       ++it;
     }
-    m_back = it; // aponta para uma posição além do último
-    // Atualiza a contagem
-    m_count = n;
+
+    m_back = it;
   }
 
   /**
@@ -153,38 +142,28 @@ public:
    */
   template<typename InputIt, typename = typename std::iterator_traits<InputIt>::iterator_category>
   Deque(InputIt first, InputIt last) {
-    size_type n = static_cast<size_type>(std::distance(first, last)); // Número de elementos no intervalo
-
-    // Número de blocos necessários para armazenar n elementos
+    size_type n{ static_cast<size_type>(std::distance(first, last)) };
     size_type blocks_needed{ (n + BlockSize - 1) / BlockSize };
+    size_type map_size{ std::max(DefaultBlkMapSize, blocks_needed) };
 
-    // Sempre alocar 3 blocos (1 no meio com espaço para crescer dos dois lados)
-    size_type map_size{ blocks_needed + 1 }; // adiciona 1 blocos extra
-    // Inicializa o vetor de blocos com ponteiros nulos
     m_mob = std::make_unique<block_list_t>(map_size);
-    // Aloca os blocos
-    for (size_type i{ 0 }; i < map_size; ++i) {
-      (*m_mob)[i] = std::make_shared<block_t>(); // O tamanho do bloco está
-                                                 // definido em `block_t`
+    for (size_type i{ 0 }; i < blocks_needed; ++i) {
+      (*m_mob)[i] = std::make_shared<block_t>();
     }
 
-    // Posição central onde os dados começarão
-    size_type start_block{ 0 };
-    // Inicializa iterador para o início (posição lógica 0)
-    m_front = iterator(m_mob->begin() + start_block,  // iterador para o bloco do início
-                       (*m_mob)[start_block]->begin() // iterador para a posição inicial dentro do bloco
-    );
+    // [!] Set iterators to the start of the block map.
+    m_front = iterator(m_mob->begin(), (*m_mob)[0]->begin());
 
     iterator it{ m_front };
-    int c{ 0 };
-    // Preenche os elementos com os valores do intervalo [first, last)
-    for (auto i = first; i != last; ++i, ++it) {
-      *it = *i;
-      ++c;
+    InputIt runner{ first };
+    while (runner != last) {
+      *it = *runner;
+      ++it;
+      ++runner;
     }
 
     m_back = it;
-    m_count = c; // Atualiza a contagem
+    m_count = n;
   }
 
   /**
@@ -192,8 +171,8 @@ public:
    *
    * Constructs a container with a copy of each of the elements in `other`.
    */
-  Deque(const Deque& other) {
-    size_type mob_size{ other.m_mob->size() }; // Número de blocos alocados
+  Deque(const Deque& other) : m_count(other.m_count) {
+    size_type mob_size{ other.m_mob->size() };
     m_mob = std::make_unique<block_list_t>(mob_size);
 
     // Aloca e copia os blocos
@@ -219,7 +198,6 @@ public:
 
     m_back = iterator(m_mob->begin() + back_blk_index,
                       (*m_mob)[back_blk_index]->begin() + back_pos); // iterador para o bloco do fim
-    m_count = other.m_count;                                         // Atualiza a contagem
   }
 
   /**
