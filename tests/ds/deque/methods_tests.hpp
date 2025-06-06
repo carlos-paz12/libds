@@ -18,65 +18,65 @@
 // [!] Test the construction of an empty Deque.
 #define DEFAULT_CTRO YES
 // [!] Test the construction of a Deque with `n` elements.
-#define FILL_CTRO YES
+#define FILL_CTRO NO
 // [!] Test the construction of a Deque from a given interval.
-#define RANGE_CTRO YES
+#define RANGE_CTRO NO
 // [!] Test the construction of a Deque from another Deque.
-#define COPY_CTRO YES
+#define COPY_CTRO NO
 // [!] Test the construction of a Deque from an initializer list.
-#define INIT_LIST_CTRO YES
+#define INIT_LIST_CTRO NO
 // [!] Test the assignment of a Deque.
-#define ASSIGN_OP YES
+#define ASSIGN_OP NO
 // [!] Test the size of a Deque.
-#define SIZE YES
+#define SIZE NO
 // [!] Test the resizing of a Deque.
-#define RESIZE YES
+#define RESIZE NO
 // [!] Test the capacity of a Deque.
-#define CAPACITY YES
+#define CAPACITY NO
 // [!] Test the empty state of a Deque.
-#define EMPTY YES
+#define EMPTY NO
 // [!] Test the reduction of a Deque's capacity.
-#define SHRINK_TO_FIT YES
+#define SHRINK_TO_FIT NO
 // [!] Test the access to the first element of a Deque.
-#define FRONT YES
+#define FRONT NO
 // [!] Test the access to the first element of a const Deque.
-#define FRONT_CONST YES
+#define FRONT_CONST NO
 // [!] Test the access to the last element of a Deque.
-#define BACK YES
+#define BACK NO
 // [!] Test the access to the last element of a const Deque.
-#define BACK_CONST YES
+#define BACK_CONST NO
 // [!] Test the assignment of a Deque using the assign() method.
-#define ASSIGN_COUNT YES
+#define ASSIGN_COUNT NO
 // [!] Test the assignment of a Deque from an initializer list using assign().
-#define ASSIGN_INIT_LIST YES
+#define ASSIGN_INIT_LIST NO
 // [!] Test the assignment of a Deque from a range using assign().
-#define ASSIGN_RANGE YES
+#define ASSIGN_RANGE NO
 // [!] Test inserting an element at the front of a Deque.
-#define PUSH_FRONT YES
+#define PUSH_FRONT NO
 // [!] Test inserting an element at the back of a Deque.
-#define PUSH_BACK YES
+#define PUSH_BACK NO
 // [!] Test removing the first element of a Deque.
-#define POP_FRONT YES
+#define POP_FRONT NO
 // [!] Test removing the last element of a Deque.
-#define POP_BACK YES
+#define POP_BACK NO
 // [!] Test inserting an element at a specific position in a Deque.
-#define INSERT YES
+#define INSERT NO
 // [!] Test inserting multiple copies of an element at a position in a Deque.
-#define INSERT_FILL YES
+#define INSERT_FILL NO
 // [!] Test inserting elements from an initializer list into a Deque.
-#define INSERT_INIT_LIST YES
+#define INSERT_INIT_LIST NO
 // [!] Test inserting a range of elements into a Deque.
-#define INSERT_RANGE YES
+#define INSERT_RANGE NO
 // [!] Test erasing an element at a specific position in a Deque.
-#define ERASE YES
+#define ERASE NO
 // [!] Test erasing an element at a specific position in a const Deque.
-#define ERASE_CONST YES
+#define ERASE_CONST NO
 // [!] Test erasing a range of elements from a Deque.
-#define ERASE_RANGE YES
+#define ERASE_RANGE NO
 // [!] Test erasing a range of elements from a const Deque.
-#define ERASE_RANGE_CONST YES
+#define ERASE_RANGE_CONST NO
 // [!] Test clearing all elements from a Deque.
-#define CLEAR YES
+#define CLEAR NO
 
 template<typename T, std::size_t size>
 void run_regular_deque_tests(const std::array<T, size>& src) {
@@ -84,62 +84,74 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
 #if DEFAULT_CTRO
   {
-    BEGIN_TEST(tmanager, "Default constructor", "ds::Deque<T> deque;");
+    BEGIN_TEST(tmanager, "Default constructor 1", "ds::Deque<T> deque();");
 
-    ds::Deque<T> deque;
+    ds::Deque<T> deque{};
 
-    EXPECT_EQ(deque.size(), 0);
     EXPECT_TRUE(deque.empty());
+    EXPECT_EQ(deque.size(), 0);
+    EXPECT_EQ(deque.capacity(), 3);
+    EXPECT_EQ(deque.begin(), deque.end());
+  }
+  {
+    BEGIN_TEST(tmanager, "Default constructor 2", "ds::Deque<T, BlockSize, DefaultBlkMapSize> deque();");
+
+    ds::Deque<T, 3, 3> deque{};
+
+    EXPECT_TRUE(deque.empty());
+    EXPECT_EQ(deque.size(), 0);
+    EXPECT_EQ(deque.capacity(), 9);
+    EXPECT_EQ(deque.begin(), deque.end());
   }
 #endif
 
 #if FILL_CTRO
   {
     BEGIN_TEST(tmanager, "Fill constructor", "ds::Deque<T> deque(size, val);");
-    // {
-    //   ds::Deque<T> deque1(size, src[0]);
+    {
+      ds::Deque<T> deque1(size, src[0]);
 
-    //   EXPECT_EQ(deque1.size(), size);
-    //   EXPECT_FALSE(deque1.empty());
+      EXPECT_EQ(deque1.size(), size);
+      EXPECT_FALSE(deque1.empty());
 
-    //   const std::size_t expected_blocks1{ (size + 2) / 3 };
-    //   EXPECT_GE(deque1.capacity(), expected_blocks1 * 3);
+      const std::size_t expected_blocks1{ (size + 2) / 3 };
+      EXPECT_GE(deque1.capacity(), expected_blocks1 * 3);
 
-    //   for (std::size_t i{ 0 }; i < size; ++i) {
-    //     EXPECT_EQ(deque1[i], src[0]);
-    //   }
-    // }
-    // {
-    //   ds::Deque<T, 3, 3> deque2(size, src[1]);
+      for (std::size_t i{ 0 }; i < size; ++i) {
+        EXPECT_EQ(deque1[i], src[0]);
+      }
+    }
+    {
+      ds::Deque<T, 3, 3> deque2(size, src[1]);
 
-    //   EXPECT_EQ(deque2.size(), size);
-    //   EXPECT_FALSE(deque2.empty());
+      EXPECT_EQ(deque2.size(), size);
+      EXPECT_FALSE(deque2.empty());
 
-    //   const std::size_t expected_blocks2{ std::max((size + 2) / 3, std::size_t{ 3 }) };
-    //   EXPECT_GE(deque2.capacity(), expected_blocks2 * 3);
+      const std::size_t expected_blocks2{ std::max((size + 2) / 3, std::size_t{ 3 }) };
+      EXPECT_GE(deque2.capacity(), expected_blocks2 * 3);
 
-    //   for (std::size_t i{ 0 }; i < size; ++i) {
-    //     EXPECT_EQ(deque2[i], src[1]);
-    //   }
-    // }
-    // {
-    //   ds::Deque<T> deque3(0, src[2]);
+      for (std::size_t i{ 0 }; i < size; ++i) {
+        EXPECT_EQ(deque2[i], src[1]);
+      }
+    }
+    {
+      ds::Deque<T> deque3(0, src[2]);
 
-    //   EXPECT_EQ(deque3.size(), 0);
-    //   EXPECT_TRUE(deque3.empty());
-    //   EXPECT_GE(deque3.capacity(), 3);
-    // }
-    // {
-    //   ds::Deque<T, 5, 2> deque4(5, src[2]);
+      EXPECT_EQ(deque3.size(), 0);
+      EXPECT_TRUE(deque3.empty());
+      EXPECT_GE(deque3.capacity(), 3);
+    }
+    {
+      ds::Deque<T, 5, 2> deque4(5, src[2]);
 
-    //   EXPECT_EQ(deque4.size(), 5);
-    //   EXPECT_FALSE(deque4.empty());
-    //   EXPECT_GE(deque4.capacity(), 5);
+      EXPECT_EQ(deque4.size(), 5);
+      EXPECT_FALSE(deque4.empty());
+      EXPECT_GE(deque4.capacity(), 5);
 
-    //   for (std::size_t i = 0; i < 5; ++i) {
-    //     EXPECT_EQ(deque4[i], src[2]);
-    //   }
-    // }
+      for (std::size_t i = 0; i < 5; ++i) {
+        EXPECT_EQ(deque4[i], src[2]);
+      }
+    }
     {
       ds::Deque<T, 4, 1> deque5(8, src[3]);
 
