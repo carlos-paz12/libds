@@ -1,10 +1,10 @@
 #ifndef DEQUE_HPP
 #define DEQUE_HPP
 
-#include <array>   // std::array
-#include <cmath>   // std::floor, std::ceil
-#include <cstddef> // std::size_t, ptrdiff_t
-#include <iostream>
+#include <array>     // std::array
+#include <cmath>     // std::floor, std::ceil
+#include <cstddef>   // std::size_t, ptrdiff_t
+#include <iostream>  // sttd::cout
 #include <iterator>  // std::iterator_traits, std::distance
 #include <memory>    // std::shared_ptr, std::unique_ptr, std::make_shared, std::make_unique
 #include <sstream>   // std::ostringstream
@@ -114,12 +114,11 @@ public:
    * `value_type()` is used.
    */
   explicit Deque(size_type n, const_reference value = value_type()) : m_count(n) {
-    size_type blocks_needed{ (n + BlockSize - 1) / BlockSize };
-    std::cout << blocks_needed << std::endl;
-    size_type map_size{ std::max(DefaultBlkMapSize, blocks_needed) + 1 };
+    size_type blocks_needed{ (n + BlockSize) / BlockSize };
+    size_type map_size{ std::max(DefaultBlkMapSize, blocks_needed) };
 
     m_mob = std::make_unique<block_list_t>(map_size);
-    for (size_type i{ 0 }; i < map_size; ++i) {
+    for (size_type i{ 0 }; i < blocks_needed; ++i) {
       (*m_mob)[i] = std::make_shared<block_t>();
     }
 
@@ -133,7 +132,6 @@ public:
     }
 
     m_back = it;
-    std::cout << this->to_string_full() << std::endl;
   }
 
   /**
@@ -145,7 +143,7 @@ public:
   template<typename InputIt, typename = typename std::iterator_traits<InputIt>::iterator_category>
   Deque(InputIt first, InputIt last) {
     size_type n{ static_cast<size_type>(std::distance(first, last)) };
-    size_type blocks_needed{ (n + BlockSize - 1) / BlockSize };
+    size_type blocks_needed{ (n + BlockSize) / BlockSize };
     size_type map_size{ std::max(DefaultBlkMapSize, blocks_needed) };
 
     m_mob = std::make_unique<block_list_t>(map_size);

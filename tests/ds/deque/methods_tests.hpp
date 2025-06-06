@@ -18,7 +18,7 @@
 // [!] Test the construction of an empty Deque.
 #define DEFAULT_CTRO YES
 // [!] Test the construction of a Deque with `n` elements.
-#define FILL_CTRO NO
+#define FILL_CTRO YES
 // [!] Test the construction of a Deque from a given interval.
 #define RANGE_CTRO NO
 // [!] Test the construction of a Deque from another Deque.
@@ -84,7 +84,7 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
 #if DEFAULT_CTRO
   {
-    BEGIN_TEST(tmanager, "Default constructor 1", "ds::Deque<T> deque();");
+    BEGIN_TEST(tmanager, "Default ctro with template default", "ds::Deque<T> deque();");
 
     ds::Deque<T> deque{};
 
@@ -94,7 +94,7 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
     EXPECT_EQ(deque.begin(), deque.end());
   }
   {
-    BEGIN_TEST(tmanager, "Default constructor 2", "ds::Deque<T, BlockSize, DefaultBlkMapSize> deque();");
+    BEGIN_TEST(tmanager, "Default ctro with template modifiers", "ds::Deque<T, BlockSize, MobSize> deque();");
 
     ds::Deque<T, 3, 3> deque{};
 
@@ -107,61 +107,77 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
 #if FILL_CTRO
   {
-    BEGIN_TEST(tmanager, "Fill constructor", "ds::Deque<T> deque(size, val);");
-    {
-      ds::Deque<T> deque1(size, src[0]);
+    BEGIN_TEST(tmanager, "Fill ctro with template default", "ds::Deque<T> deque(n, value);");
 
-      EXPECT_EQ(deque1.size(), size);
-      EXPECT_FALSE(deque1.empty());
+    ds::Deque<T> deque(src.size(), src[0]);
 
-      const std::size_t expected_blocks1{ (size + 2) / 3 };
-      EXPECT_GE(deque1.capacity(), expected_blocks1 * 3);
+    EXPECT_FALSE(deque.empty());
+    EXPECT_EQ(deque.size(), src.size());
 
-      for (std::size_t i{ 0 }; i < size; ++i) {
-        EXPECT_EQ(deque1[i], src[0]);
-      }
+    const std::size_t expected_capacity{ (src.size() + 3) / 3 };
+    EXPECT_EQ(deque.capacity(), expected_capacity * 3);
+
+    for (std::size_t i{ 0 }; i < src.size(); ++i) {
+      EXPECT_EQ(deque[i], src[0]);
     }
-    {
-      ds::Deque<T, 3, 3> deque2(size, src[1]);
 
-      EXPECT_EQ(deque2.size(), size);
-      EXPECT_FALSE(deque2.empty());
+    EXPECT_LT(deque.begin(), deque.end());
+  }
+  {
+    BEGIN_TEST(tmanager, "Fill ctro with template modifiers", "ds::Deque<T, BlockSize, MobSize> deque(n, value);");
 
-      const std::size_t expected_blocks2{ std::max((size + 2) / 3, std::size_t{ 3 }) };
-      EXPECT_GE(deque2.capacity(), expected_blocks2 * 3);
+    ds::Deque<T, 3, 3> deque(src.size(), src[1]);
 
-      for (std::size_t i{ 0 }; i < size; ++i) {
-        EXPECT_EQ(deque2[i], src[1]);
-      }
+    EXPECT_FALSE(deque.empty());
+    EXPECT_EQ(deque.size(), src.size());
+
+    const std::size_t expected_capacity{ std::max((src.size() + 3) / 3, std::size_t{ 3 }) };
+    EXPECT_GE(deque.capacity(), expected_capacity * 3);
+
+    for (std::size_t i{ 0 }; i < src.size(); ++i) {
+      EXPECT_EQ(deque[i], src[1]);
     }
-    {
-      ds::Deque<T> deque3(0, src[2]);
 
-      EXPECT_EQ(deque3.size(), 0);
-      EXPECT_TRUE(deque3.empty());
-      EXPECT_GE(deque3.capacity(), 3);
+    EXPECT_LT(deque.begin(), deque.end());
+  }
+  {
+    BEGIN_TEST(tmanager, "Fill ctro empty", "ds::Deque<T> deque(0, value);");
+
+    ds::Deque<T> deque(0, src[2]);
+
+    EXPECT_TRUE(deque.empty());
+    EXPECT_EQ(deque.size(), 0);
+    EXPECT_EQ(deque.capacity(), 3);
+    EXPECT_EQ(deque.begin(), deque.end());
+  }
+  {
+    BEGIN_TEST(tmanager, "Fill ctro with n < BlockSize", "ds::Deque<T, BlockSize, MobSize> deque(n, value);");
+
+    std::size_t small_n{ 2 };
+    ds::Deque<T, 3, 3> deque(small_n, src[3]);
+
+    EXPECT_EQ(deque.size(), small_n);
+
+    const std::size_t expected_capacity{ std::max((small_n + 3) / 3, std::size_t{ 3 }) };
+    EXPECT_GE(deque.capacity(), expected_capacity * 3);
+
+    for (std::size_t i = 0; i < small_n; ++i) {
+      EXPECT_EQ(deque[i], src[3]);
     }
-    {
-      ds::Deque<T, 5, 2> deque4(5, src[2]);
+  }
+  {
+    BEGIN_TEST(tmanager, "Fill ctro without expansion", "ds::Deque<T, BlockSize, MobSize> deque(n, value);");
 
-      EXPECT_EQ(deque4.size(), 5);
-      EXPECT_FALSE(deque4.empty());
-      EXPECT_GE(deque4.capacity(), 5);
+    std::size_t n{ 10 };
+    ds::Deque<T, 3, 5> deque(n, src[4]);
 
-      for (std::size_t i = 0; i < 5; ++i) {
-        EXPECT_EQ(deque4[i], src[2]);
-      }
-    }
-    {
-      ds::Deque<T, 4, 1> deque5(8, src[3]);
+    EXPECT_EQ(deque.size(), n);
 
-      EXPECT_EQ(deque5.size(), 8);
-      EXPECT_FALSE(deque5.empty());
-      EXPECT_GE(deque5.capacity(), 8);
+    const std::size_t expected_capacity{ std::max((n + 3) / 3, std::size_t{ 5 }) };
+    EXPECT_GE(deque.capacity(), expected_capacity * 3);
 
-      for (std::size_t i = 0; i < 8; ++i) {
-        EXPECT_EQ(deque5[i], src[3]);
-      }
+    for (std::size_t i = 0; i < n; ++i) {
+      EXPECT_EQ(deque[i], src[4]);
     }
   }
 #endif
