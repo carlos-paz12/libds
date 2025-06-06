@@ -579,7 +579,27 @@ public:
   [[nodiscard]] bool empty() const { return (m_count == 0); }
 
   /// Deletes unused slots.
-  void shrink_to_fit() { }
+  void shrink_to_fit() {
+    size_t front_elem_idx = m_front.m_current - (*m_front.m_block)->begin();
+    size_t back_elem_idx = m_back.m_current - (*m_back.m_block)->begin();
+
+    block_list_t new_blocks;
+    auto front_block_it{ m_front.m_block };
+    auto back_block_it{ m_back.m_block };
+
+    for (auto it{ front_block_it }; it <= back_block_it; ++it) {
+      if (*it) {
+        new_blocks.push_back(*it);
+      }
+    }
+
+    *m_mob = std::move(new_blocks);
+
+    m_front = iterator(m_mob->begin(), (*m_mob)[0]->begin() + front_elem_idx);
+    m_back = iterator(m_mob->begin() + (m_mob->size() - 1), (*m_mob).back()->begin() + back_elem_idx);
+
+    m_mob->shrink_to_fit();
+  }
 
   //================================================== ELEMENT ACCESS:
   /// Returns a reference to the element at specified location `pos`.
