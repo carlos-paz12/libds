@@ -16,67 +16,67 @@
 #define NO 0
 
 // [!] Test the construction of an empty Deque.
-#define DEFAULT_CTRO NO
+#define DEFAULT_CTRO YES
 // [!] Test the construction of a Deque with `n` elements.
-#define FILL_CTRO NO
+#define FILL_CTRO YES
 // [!] Test the construction of a Deque from a given interval.
-#define RANGE_CTRO NO
+#define RANGE_CTRO YES
 // [!] Test the construction of a Deque from another Deque.
-#define COPY_CTRO NO
+#define COPY_CTRO YES
 // [!] Test the construction of a Deque from an initializer list.
-#define INIT_LIST_CTRO NO
+#define INIT_LIST_CTRO YES
 // [!] Test the assignment of a Deque.
-#define ASSIGN_OP NO
+#define ASSIGN_OP YES
 // [!] Test the size of a Deque.
-#define SIZE NO
+#define SIZE YES
 // [!] Test the resizing of a Deque.
-#define RESIZE NO
+#define RESIZE YES
 // [!] Test the capacity of a Deque.
-#define CAPACITY NO
+#define CAPACITY YES
 // [!] Test the empty state of a Deque.
-#define EMPTY NO
+#define EMPTY YES
 // [!] Test the reduction of a Deque's capacity.
 #define SHRINK_TO_FIT YES
 // [!] Test the access to the first element of a Deque.
-#define FRONT NO
+#define FRONT YES
 // [!] Test the access to the first element of a const Deque.
-#define FRONT_CONST NO
+#define FRONT_CONST YES
 // [!] Test the access to the last element of a Deque.
-#define BACK NO
+#define BACK YES
 // [!] Test the access to the last element of a const Deque.
-#define BACK_CONST NO
+#define BACK_CONST YES
 // [!] Test the assignment of a Deque using the assign() method.
-#define ASSIGN_COUNT NO
+#define ASSIGN_COUNT YES
 // [!] Test the assignment of a Deque from an initializer list using assign().
-#define ASSIGN_INIT_LIST NO
+#define ASSIGN_INIT_LIST YES
 // [!] Test the assignment of a Deque from a range using assign().
-#define ASSIGN_RANGE NO
+#define ASSIGN_RANGE YES
 // [!] Test inserting an element at the front of a Deque.
-#define PUSH_FRONT NO
+#define PUSH_FRONT YES
 // [!] Test inserting an element at the back of a Deque.
-#define PUSH_BACK NO
+#define PUSH_BACK YES
 // [!] Test removing the first element of a Deque.
-#define POP_FRONT NO
+#define POP_FRONT YES
 // [!] Test removing the last element of a Deque.
-#define POP_BACK NO
+#define POP_BACK YES
 // [!] Test inserting an element at a specific position in a Deque.
-#define INSERT NO
+#define INSERT YES
 // [!] Test inserting multiple copies of an element at a position in a Deque.
-#define INSERT_FILL NO
+#define INSERT_FILL YES
 // [!] Test inserting elements from an initializer list into a Deque.
-#define INSERT_INIT_LIST NO
+#define INSERT_INIT_LIST YES
 // [!] Test inserting a range of elements into a Deque.
-#define INSERT_RANGE NO
+#define INSERT_RANGE YES
 // [!] Test erasing an element at a specific position in a Deque.
-#define ERASE NO
+#define ERASE YES
 // [!] Test erasing an element at a specific position in a const Deque.
-#define ERASE_CONST NO
+#define ERASE_CONST YES
 // [!] Test erasing a range of elements from a Deque.
-#define ERASE_RANGE NO
+#define ERASE_RANGE YES
 // [!] Test erasing a range of elements from a const Deque.
-#define ERASE_RANGE_CONST NO
+#define ERASE_RANGE_CONST YES
 // [!] Test clearing all elements from a Deque.
-#define CLEAR NO
+#define CLEAR YES
 
 template<typename T, std::size_t size>
 void run_regular_deque_tests(const std::array<T, size>& src) {

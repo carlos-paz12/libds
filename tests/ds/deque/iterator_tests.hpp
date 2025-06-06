@@ -12,50 +12,50 @@
 
 // Test begin() method that should return a iterator to the first element in the
 // container.
-#define BEGIN NO
+#define BEGIN YES
 // Test cbegin() method that should return a const iterator to the first element
 // in the container.
-#define CBEGIN NO
+#define CBEGIN YES
 // Test end() method that should return a iterator to a location just past the
 // last elemento of a container.
-#define END NO
+#define END YES
 // Test cend() method that should return a const iterator to a location just
 // past the last elemento of a container.
-#define CEND NO
+#define CEND YES
 // Pre-increment operator. ++it
-#define PRE_INC NO
+#define PRE_INC YES
 // Post-increment operator. it++
-#define POST_INC NO
+#define POST_INC YES
 // Pre-decrement operator. --it
-#define PRE_DEC NO
+#define PRE_DEC YES
 // Post-decrement operator. it--
-#define POST_DEC NO
+#define POST_DEC YES
 // Dreference operator. *it
-#define DEREFERENCE NO
+#define DEREFERENCE YES
 // Differentre between iterators. it1 - it2
-#define DIFFERENCE NO
+#define DIFFERENCE YES
 // Add a offset to a iterator. offset + it
-#define ADD_OFFSET_IT NO
+#define ADD_OFFSET_IT YES
 // Add an iterator and an offset. it + offset
-#define ADD_IT_OFFSET NO
+#define ADD_IT_OFFSET YES
 // Subtract an iterator and an offset. it - offset
-#define SUB_IT_OFFSET NO
+#define SUB_IT_OFFSET YES
 // Self addition iterator and offset. it += 0ffset
-#define SELF_ADD_IT_OFFSET NO
+#define SELF_ADD_IT_OFFSET YES
 // Self subtraction iterator and offset. it -= 0ffset
-#define SELF_SUB_IT_OFFSET NO
+#define SELF_SUB_IT_OFFSET YES
 // Less operator. it1 < it2
-#define LESS NO
+#define LESS YES
 // Greater operator. it1 > it2
-#define GREATER NO
+#define GREATER YES
 // Less equal operator. it1 <= it2
-#define LESS_EQ NO
+#define LESS_EQ YES
 // Greater equal operator. it1 >= it2
-#define GREATER_EQ NO
+#define GREATER_EQ YES
 // Equal operator. it1 == it2
-#define EQUAL NO
+#define EQUAL YES
 // Different operator. it1 != it2
-#define DIFFERENT NO
+#define DIFFERENT YES
 
 template<typename DequeType>
 void run_iterator_tests() {
