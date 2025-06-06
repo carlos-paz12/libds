@@ -267,9 +267,6 @@ public:
    */
   Deque() {
     m_mob = std::make_unique<block_list_t>(DefaultBlkMapSize);
-    for (size_type i{ 0 }; i < DefaultBlkMapSize; ++i) {
-      (*m_mob)[i] = std::make_shared<block_t>();
-    }
 
     /*!
      * In default case, `start_block` will be given the floor value of 1/2, i.e.
@@ -310,6 +307,8 @@ public:
     size_type offset_initial_blk{ static_cast<size_type>(std::floor(DefaultBlkMapSize / 2)) };
     //!< Offset to define who is it initial element in initial block.
     size_type offset_initial_element{ static_cast<size_type>(std::floor(BlockSize / 2)) };
+
+    (*m_mob)[offset_initial_blk] = std::make_shared<block_t>();
 
     m_front =
       iterator(m_mob->begin() + offset_initial_blk, (*m_mob)[offset_initial_blk]->begin() + offset_initial_element);
