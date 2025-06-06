@@ -51,14 +51,15 @@ public:
 
   /// @brief Operador de pré-incremento.
   Iterator& operator++() {
-    m_current++;                        // [!] Avança o iterador dentro do bloco atual
-    if (m_current == (*m_block)->end()) // [!] Verifica se chegou no fim do bloco atual.
+    if (m_current + 1 == (*m_block)->end()) // [!] Verifica se chegou no fim do bloco atual.
     {
       // [!] Se chegou...
       m_block++;                       // [!] avança para o próximo bloco e...
       m_current = (*m_block)->begin(); // [!] posiciona o ponteiro do elemento
                                        // para o início do novo bloco.
-    }
+    } else {
+      m_current++;
+    } // [!] Avança o iterador dentro do bloco atual
     return *this;
   }
 

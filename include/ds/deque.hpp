@@ -115,10 +115,11 @@ public:
    */
   explicit Deque(size_type n, const_reference value = value_type()) : m_count(n) {
     size_type blocks_needed{ (n + BlockSize - 1) / BlockSize };
-    size_type map_size{ std::max(DefaultBlkMapSize, blocks_needed) };
+    std::cout << blocks_needed << std::endl;
+    size_type map_size{ std::max(DefaultBlkMapSize, blocks_needed) + 1 };
 
     m_mob = std::make_unique<block_list_t>(map_size);
-    for (size_type i{ 0 }; i < blocks_needed; ++i) {
+    for (size_type i{ 0 }; i < map_size; ++i) {
       (*m_mob)[i] = std::make_shared<block_t>();
     }
 
@@ -132,6 +133,7 @@ public:
     }
 
     m_back = it;
+    std::cout << this->to_string_full() << std::endl;
   }
 
   /**
@@ -788,9 +790,6 @@ private:
     auto& old_mob_ref{ *m_mob };
     //!< New MOB vector reference.
     auto& new_mob_ref{ *new_mob };
-    for (size_type i{ 0 }; i < new_size; ++i) {
-      //  new_mob_ref[i] = std::make_shared<block_t>();
-    }
     //!< Offset to center the used blocks inside the new MOB.
     const size_type offset{ (new_size - total_blocks_in_use) / 2 };
 
