@@ -36,7 +36,7 @@
 // [!] Test the empty state of a Deque.
 #define EMPTY NO
 // [!] Test the reduction of a Deque's capacity.
-#define SHRINK_TO_FIT NO
+#define SHRINK_TO_FIT YES
 // [!] Test the access to the first element of a Deque.
 #define FRONT NO
 // [!] Test the access to the first element of a const Deque.
@@ -46,11 +46,11 @@
 // [!] Test the access to the last element of a const Deque.
 #define BACK_CONST NO
 // [!] Test the assignment of a Deque using the assign() method.
-#define ASSIGN_COUNT YES
+#define ASSIGN_COUNT NO
 // [!] Test the assignment of a Deque from an initializer list using assign().
-#define ASSIGN_INIT_LIST YES
+#define ASSIGN_INIT_LIST NO
 // [!] Test the assignment of a Deque from a range using assign().
-#define ASSIGN_RANGE YES
+#define ASSIGN_RANGE NO
 // [!] Test inserting an element at the front of a Deque.
 #define PUSH_FRONT NO
 // [!] Test inserting an element at the back of a Deque.
@@ -248,6 +248,68 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 #endif
 
 #if SHRINK_TO_FIT
+  {
+    BEGIN_TEST(tmanager, "Shrink to fit", "deque.shrink_to_fit();");
+
+    {
+      ds::Deque<T, 3, 3> deque;
+      deque.push_back(src[0]);
+      deque.push_back(src[1]);
+
+      const auto old_size{ deque.size() };
+      const auto old_front{ deque.front() };
+      const auto old_back{ deque.back() };
+      const auto old_capacity{ deque.capacity() };
+
+      deque.shrink_to_fit();
+
+      EXPECT_EQ(deque.size(), old_size);
+      EXPECT_EQ(deque.front(), old_front);
+      EXPECT_EQ(deque.back(), old_back);
+      EXPECT_LE(deque.capacity(), old_capacity);
+    }
+
+    {
+      ds::Deque<T, 3, 2> deque;
+
+      for (std::size_t i = 0; i < 2 * size; ++i) {
+        deque.push_back(src[i % size]);
+      }
+
+      const auto old_size{ deque.size() };
+      const auto old_capacity{ deque.capacity() };
+      const auto old_elements = [&]() {
+        std::vector<T> elements;
+        for (const auto& el : deque) elements.push_back(el);
+        return elements;
+      }();
+
+      deque.shrink_to_fit();
+
+      EXPECT_EQ(deque.size(), old_size);
+      EXPECT_LE(deque.capacity(), old_capacity);
+
+      for (std::size_t i = 0; i < old_size; ++i) {
+        EXPECT_EQ(deque[i], old_elements[i]);
+      }
+
+      deque.push_back(src[0]);
+      EXPECT_EQ(deque.back(), src[0]);
+      deque.push_front(src[1]);
+      EXPECT_EQ(deque.front(), src[1]);
+    }
+
+    {
+      ds::Deque<T, 3, 3> deque;
+      const auto old_capacity{ deque.capacity() };
+
+      deque.shrink_to_fit();
+
+      EXPECT_EQ(deque.size(), 0);
+      EXPECT_LE(deque.capacity(), old_capacity);
+      EXPECT_TRUE(deque.empty());
+    }
+  }
 #endif
 
 #if FRONT
