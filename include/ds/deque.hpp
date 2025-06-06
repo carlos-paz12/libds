@@ -629,20 +629,25 @@ private:
   }
 
   [[nodiscard]] bool need_allocate_before_front() const {
+
+    bool in_mob_start{ m_front.m_block == m_mob->begin() };
     bool in_block_start{ m_front.m_current == (*m_front.m_block)->begin() };
-    bool to_allocate{ *(std::prev(m_front.m_block)) == nullptr };
+    // [!] `not in_mob_start` prevines access before 'mob' begin.
+    bool to_allocate{ not in_mob_start and *(std::prev(m_front.m_block)) == nullptr };
     return in_block_start and to_allocate;
   }
 
   [[nodiscard]] bool need_expand_after_back() const {
-    bool in_block_end{ m_back.m_current == (*m_back.m_block)->end() - 1 };
     bool in_mob_end{ m_back.m_block == m_mob->end() - 1 };
-    return in_block_end and in_mob_end;
+    bool in_block_end{ m_back.m_current == (*m_back.m_block)->end() - 1 };
+    return in_mob_end and in_block_end;
   }
 
   [[nodiscard]] bool need_allocate_after_back() const {
+    bool in_mob_end{ m_back.m_block == m_mob->end() - 1 };
     bool in_block_end{ m_back.m_current == (*m_back.m_block)->end() - 1 };
-    bool to_allocate{ *(std::next(m_back.m_block)) == nullptr };
+    // [!] `not in_mob_end` prevines access after 'mob' end.
+    bool to_allocate{ not in_mob_end and *(std::next(m_back.m_block)) == nullptr };
     return in_block_end and to_allocate;
   }
 
