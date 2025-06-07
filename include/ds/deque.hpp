@@ -171,33 +171,19 @@ public:
    *
    * Constructs a container with a copy of each of the elements in `other`.
    */
-  Deque(const Deque& other) : m_count(other.m_count) {
-    size_type mob_size{ other.m_mob->size() };
-    m_mob = std::make_unique<block_list_t>(mob_size);
-
-    // Aloca e copia os blocos
-    for (size_type i = 0; i < mob_size; ++i) {
+  Deque(const Deque& other) : m_mob(std::make_unique<block_list_t>(other.m_mob->size())), m_count(other.m_count) {
+    for (size_type i{ 0 }; i < m_mob->size(); ++i) {
       (*m_mob)[i] = std::make_shared<block_t>();
-      std::copy((*other.m_mob)[i]->begin(),
-                (*other.m_mob)[i]->end(),
-                (*m_mob)[i]->begin()); // Copia os elementos do bloco
+      std::copy((*other.m_mob)[i]->begin(), (*other.m_mob)[i]->end(), (*m_mob)[i]->begin());
     }
 
-    // Recalcula a distância entre m_mob->begin() e os iteradores do other
-    auto front_blk_index{ other.m_front.m_block - other.m_mob->begin() }; // faz o calculo da distância entre o
-                                                                          // bloco inicial e o bloco atual
-    auto back_blk_index{ other.m_back.m_block - other.m_mob->begin() };   // faz o calculo da distância entre o bloco
-                                                                          // inicial e o bloco atual
-    // Recalcula a posição dentro do bloco
-    auto front_pos{ other.m_front.m_current - (*other.m_front.m_block)->begin() }; // valor da posição dentro do bloco
-    auto back_pos{ other.m_back.m_current - (*other.m_back.m_block)->begin() };    // valor da posição dentro do bloco
+    const auto mob_front_offset{ std::distance(other.m_mob->begin(), other.m_front.m_block) };
+    const auto block_front_offset{ std::distance((*other.m_front.m_block)->begin(), other.m_front.m_current) };
+    const auto mob_back_offset{ std::distance(other.m_mob->begin(), other.m_back.m_block) };
+    const auto block_back_offset{ std::distance((*other.m_back.m_block)->begin(), other.m_back.m_current) };
 
-    // Cria novos iteradores com base nos blocos da nova m_mob
-    m_front = iterator(m_mob->begin() + front_blk_index,
-                       (*m_mob)[front_blk_index]->begin() + front_pos); // iterador para o bloco do início
-
-    m_back = iterator(m_mob->begin() + back_blk_index,
-                      (*m_mob)[back_blk_index]->begin() + back_pos); // iterador para o bloco do fim
+    m_front = iterator(m_mob->begin() + mob_front_offset, (*m_mob)[mob_front_offset]->begin() + block_front_offset);
+    m_back = iterator(m_mob->begin() + mob_back_offset, (*m_mob)[mob_back_offset]->begin() + block_back_offset);
   }
 
   /**
