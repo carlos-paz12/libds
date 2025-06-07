@@ -28,13 +28,13 @@
 // [!] Test the assignment of a Deque.
 #define ASSIGN_OP NO
 // [!] Test the size of a Deque.
-#define SIZE NO
+#define SIZE YES
 // [!] Test the resizing of a Deque.
 #define RESIZE NO
 // [!] Test the capacity of a Deque.
-#define CAPACITY NO
+#define CAPACITY YES
 // [!] Test the empty state of a Deque.
-#define EMPTY NO
+#define EMPTY YES
 // [!] Test the reduction of a Deque's capacity.
 #define SHRINK_TO_FIT NO
 // [!] Test the access to the first element of a Deque.
@@ -313,13 +313,37 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
 #if SIZE
   {
-    BEGIN_TEST(tmanager, "Size", "deque.size();");
+    BEGIN_TEST(tmanager, "Size on empty deque with fill constructor", "ds::Deque<T> deque(0, value);");
 
-    ds::Deque<T> deque;
+    ds::Deque<T> deque(0, src[0]);
+
+    EXPECT_TRUE(deque.empty());
     EXPECT_EQ(deque.size(), 0);
+    EXPECT_EQ(deque.capacity(), 3);
+    EXPECT_EQ(deque.begin(), deque.end());
+  }
+  {
+    BEGIN_TEST(tmanager, "Size on filled deque with default template", "ds::Deque<T> deque(n, value);");
 
-    ds::Deque<T> deque2(src.begin(), src.end());
-    EXPECT_EQ(deque2.size(), src.size());
+    ds::Deque<T> deque(src.size(), src[0]);
+
+    EXPECT_FALSE(deque.empty());
+    EXPECT_EQ(deque.size(), src.size());
+
+    const std::size_t expected_capacity{ (src.size() + 3) / 3 };
+    EXPECT_EQ(deque.capacity(), expected_capacity * 3);
+  }
+  {
+    BEGIN_TEST(
+      tmanager, "Size on filled deque with template modifiers", "ds::Deque<T, BlockSize, MobSize> deque(n, value);");
+
+    ds::Deque<T, 3, 4> deque(src.size(), src[1]);
+
+    EXPECT_FALSE(deque.empty());
+    EXPECT_EQ(deque.size(), src.size());
+
+    const std::size_t expected_capacity{ std::max((src.size() + 3) / 3, std::size_t{ 4 }) };
+    EXPECT_GE(deque.capacity(), expected_capacity * 3);
   }
 #endif
 
@@ -362,25 +386,45 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
 #if CAPACITY
   {
-    BEGIN_TEST(tmanager, "Capacity", "deque.capacity();");
+    BEGIN_TEST(tmanager, "Capacity with default template", "ds::Deque<T> deque(n, value);");
 
-    ds::Deque<T> deque1;
-    EXPECT_EQ(deque1.capacity(), 3);
+    ds::Deque<T> deque(5, src[0]);
 
-    ds::Deque<T, 4, 2> deque2;
-    EXPECT_EQ(deque2.capacity(), 8);
+    const std::size_t expected_capacity{ ((5 + 3) / 3) * 3 };
+    EXPECT_EQ(deque.capacity(), expected_capacity);
+  }
+  {
+    BEGIN_TEST(tmanager, "Capacity with template modifiers", "ds::Deque<T, BlockSize, MobSize> deque(n, value);");
+
+    std::size_t n = 10;
+    ds::Deque<T, 4, 2> deque(n, src[1]);
+
+    const std::size_t expected_capacity{ std::max((n + 4) / 4, std::size_t{ 2 }) * 4 };
+    EXPECT_EQ(deque.capacity(), expected_capacity);
+  }
+  {
+    BEGIN_TEST(tmanager, "Capacity with n == 0", "ds::Deque<T> deque(0, value);");
+
+    ds::Deque<T> deque(0, src[2]);
+
+    EXPECT_EQ(deque.capacity(), 3);
   }
 #endif
 
 #if EMPTY
   {
-    BEGIN_TEST(tmanager, "Empty", "deque.empty();");
+    BEGIN_TEST(tmanager, "Empty with n == 0", "ds::Deque<T> deque(0, value);");
 
-    ds::Deque<T> deque;
+    ds::Deque<T> deque(0, src[0]);
+
     EXPECT_TRUE(deque.empty());
+  }
+  {
+    BEGIN_TEST(tmanager, "Empty with n > 0", "ds::Deque<T> deque(n, value);");
 
-    ds::Deque<T> deque2(src.begin(), src.end());
-    EXPECT_FALSE(deque2.empty());
+    ds::Deque<T> deque(5, src[1]);
+
+    EXPECT_FALSE(deque.empty());
   }
 #endif
 
