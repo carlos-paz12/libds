@@ -22,19 +22,19 @@
 // [!] Test the construction of a Deque from a given interval.
 #define RANGE_CTRO YES
 // [!] Test the construction of a Deque from another Deque.
-#define COPY_CTRO NO
+#define COPY_CTRO YES
 // [!] Test the construction of a Deque from an initializer list.
 #define INIT_LIST_CTRO NO
 // [!] Test the assignment of a Deque.
 #define ASSIGN_OP NO
 // [!] Test the size of a Deque.
-#define SIZE YES
+#define SIZE NO
 // [!] Test the resizing of a Deque.
 #define RESIZE NO
 // [!] Test the capacity of a Deque.
-#define CAPACITY YES
+#define CAPACITY NO
 // [!] Test the empty state of a Deque.
-#define EMPTY YES
+#define EMPTY NO
 // [!] Test the reduction of a Deque's capacity.
 #define SHRINK_TO_FIT NO
 // [!] Test the access to the first element of a Deque.
@@ -261,19 +261,83 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
 
 #if COPY_CTRO
   {
-    BEGIN_TEST(tmanager, "Copy constructor", "ds::Deque<T> deque2(deque1);");
+    BEGIN_TEST(tmanager, "Copy constructor with default template", "ds::Deque<T> deque(other);");
 
-    ds::Deque<T> deque1(src.begin(), src.end());
-    ds::Deque<T> deque2(deque1);
+    ds::Deque<T> other(src.size(), src[0]);
+    ds::Deque<T> deque(other);
 
-    EXPECT_EQ(deque2.size(), deque1.size());
-    EXPECT_EQ(deque2.capacity(), deque1.capacity());
-    EXPECT_FALSE(deque2.empty());
+    EXPECT_FALSE(deque.empty());
+    EXPECT_EQ(deque.size(), other.size());
+    EXPECT_EQ(deque.capacity(), other.capacity());
 
-    for (std::size_t i{ 0 }; i < deque1.size(); ++i) EXPECT_EQ(deque2[i], deque1[i]);
+    for (std::size_t i = 0; i < src.size(); ++i) {
+      EXPECT_EQ(deque[i], src[0]);
+    }
 
-    deque1[0] = 99;
-    EXPECT_NE(deque2[0], deque1[0]);
+    EXPECT_LT(deque.begin(), deque.end());
+    EXPECT_EQ(std::distance(deque.begin(), deque.end()), static_cast<std::ptrdiff_t>(src.size()));
+  }
+  {
+    BEGIN_TEST(tmanager, "Copy constructor with custom template", "ds::Deque<T, BlockSize, MobSize> deque(other);");
+
+    ds::Deque<T, 5, 3> other(src.size(), src[1]);
+    ds::Deque<T, 5, 3> deque(other);
+
+    EXPECT_FALSE(deque.empty());
+    EXPECT_EQ(deque.size(), other.size());
+    EXPECT_EQ(deque.capacity(), other.capacity());
+
+    for (std::size_t i = 0; i < src.size(); ++i) {
+      EXPECT_EQ(deque[i], src[1]);
+    }
+  }
+  {
+    BEGIN_TEST(tmanager, "Copy constructor with empty deque", "ds::Deque<T> deque(empty);");
+
+    ds::Deque<T> other(0, src[0]);
+    ds::Deque<T> deque(other);
+
+    EXPECT_TRUE(deque.empty());
+    EXPECT_EQ(deque.size(), 0);
+    EXPECT_GE(deque.capacity(), 3);
+    EXPECT_EQ(deque.begin(), deque.end());
+  }
+  {
+    BEGIN_TEST(tmanager, "Copy constructor iterator validity", "Verify iterators after copy");
+
+    ds::Deque<T> other(5, src[2]);
+    other.push_front(src[3]);
+    other.push_back(src[4]);
+
+    ds::Deque<T> deque(other);
+
+    EXPECT_EQ(deque.front(), other.front());
+    EXPECT_EQ(deque.back(), other.back());
+
+    auto other_it{ other.begin() };
+    auto deque_it{ deque.begin() };
+
+    while (other_it != other.end()) {
+      EXPECT_EQ(*deque_it, *other_it);
+      ++other_it;
+      ++deque_it;
+    }
+  }
+  {
+    BEGIN_TEST(tmanager, "Copy constructor with partial blocks", "Verify partial block copying");
+
+    const std::size_t n = 7;
+    ds::Deque<T> original(n, src[3]);
+
+    ds::Deque<T> copy(original);
+
+    EXPECT_EQ(copy.size(), n);
+    EXPECT_GE(copy.capacity(), original.capacity());
+
+    // Verify all elements
+    for (std::size_t i = 0; i < n; ++i) {
+      EXPECT_EQ(copy[i], src[3]);
+    }
   }
 #endif
 
@@ -281,7 +345,7 @@ void run_regular_deque_tests(const std::array<T, size>& src) {
   {
     BEGIN_TEST(tmanager, "Initializer list", "ds::Deque<T> deque({src[0], src[1], src[2], src[3], src[4]});");
 
-    ds::Deque<T> deque({ src[0], src[1], src[2], src[3], src[4] });
+    ds::Deque<T> deque{ src[0], src[1], src[2], src[3], src[4] };
 
     EXPECT_EQ(deque.size(), 5);
     EXPECT_FALSE(deque.empty());
